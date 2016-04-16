@@ -11,3 +11,5 @@ Require-Bundle:
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
+Export-Package: com.ensoftcorp.open.slice,
+ com.ensoftcorp.open.slice.analysis
