@@ -2,4 +2,14 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <extension
+         point="com.ensoftcorp.atlas.ui.smartViewScript">
+      <script
+            class="com.ensoftcorp.open.slice.smart.CDGReverseSliceSmartView">
+      </script>
+      <script
+            class="com.ensoftcorp.open.slice.smart.CDGForwardSliceSmartView">
+      </script>
+   </extension>
+
 </plugin>

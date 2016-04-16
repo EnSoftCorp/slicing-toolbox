@@ -15,7 +15,7 @@ import com.ensoftcorp.open.slice.analysis.DominanceAnalysis.Multimap;
 
 public class ForwardDominanceTree implements UniqueEntryExitGraph {
 
-	private static final String FORWARD_DOMINANCE_EDGE = "FORWARD_DOMINANCE";
+	private static final String FORWARD_DOMINANCE_EDGE = "ifdom";
 	
 	/**
 	 * The set of nodes in the current graph
@@ -37,7 +37,7 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 		this.edges().addAll(cfg.edges());
 	}
 	
-	public AtlasSet<GraphElement> getForwardDominanceTree(){
+	public Graph getForwardDominanceTree(){
 		DominanceAnalysis dominanceAnalysis = new DominanceAnalysis(this, true);
 		Multimap<GraphElement> dominanceFrontier = dominanceAnalysis.getDominanceFrontiers();
 		AtlasSet<GraphElement> dominanceTree = new AtlasHashSet<GraphElement>();
@@ -54,7 +54,7 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 				dominanceTree.add(forwardDominanceEdge);
 			}
 		}
-		return dominanceTree;
+		return Common.toQ(dominanceTree).eval();
 	}
 
 	/**
