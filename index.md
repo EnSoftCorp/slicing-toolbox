@@ -3,12 +3,12 @@ layout: default
 ---
 
 ## Overview
-The Slicing Toolbox project provides Atlas native Program Dependence Graph (PDG) based program slicing.
+The Slicing Toolbox project provides Atlas native Program Dependence Graph (PDG) based [program slicing](https://en.wikipedia.org/wiki/Program_slicing).
 
 ## Features
 The Slicing Toolbox project supports the following.
 
-- Forward Dominance Tree (Post Dominance) analysis
+- Forward Dominance Tree ([Post Dominance](https://en.wikipedia.org/wiki/Dominator_(graph_theory)#Postdominance)) analysis
 - Reverse and forward Control Dependence Graph (CDG) slices
 - Reverse and forward Flow (Data) Dependence Graph (FDG) slices
 - Reverse and forward Program Dependence Graph (PDG) slices
