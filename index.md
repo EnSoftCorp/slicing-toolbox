@@ -14,8 +14,8 @@ The Slicing Toolbox project supports the following.
 - Reverse and forward Control Dependence Graph (CDG) slices
 - Reverse and forward Flow (Data) Dependence Graph (FDG) slices
 - Reverse and forward Program Dependence Graph (PDG) slices
-- Source to sink taint analysis
 - Convenient Smart Views for viewing slice and post dominance results
+- Source to sink taint analysis
 
 ## Getting Started
 Ready to get started?
