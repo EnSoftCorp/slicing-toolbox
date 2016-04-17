@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/SlicingToolbox_2.7.3.201604170040.jar" id="SlicingToolbox" version="2.7.3.201604170040">
+      <category name="Slicing Toolbox"/>
+   </feature>
+   <category-def name="Slicing Toolbox" label="Slicing Toolbox">
+      <description>
+         A toolbox for program slicing in Atlas.
+      </description>
+   </category-def>
+</site>
