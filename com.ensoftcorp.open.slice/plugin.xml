@@ -16,6 +16,12 @@
       <script
             class="com.ensoftcorp.open.slice.smart.FDGForwardSliceSmartView">
       </script>
+      <script
+            class="com.ensoftcorp.open.slice.smart.PDGReverseSliceSmartView">
+      </script>
+      <script
+            class="com.ensoftcorp.open.slice.smart.PDGForwardSliceSmartView">
+      </script>
    </extension>
 
 </plugin>

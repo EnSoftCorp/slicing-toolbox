@@ -30,11 +30,11 @@ public class FDGReverseSliceSmartView extends SliceSmartView {
 	}
 	
 	@Override
-	protected Q getSlice(GraphElement selection, GraphElement method) {
+	protected Q getSlice(GraphElement dataFlowNode, GraphElement method) {
 		Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
 		Q dfg = Common.toQ(method).contained().induce(dataFlowEdges);
 		FlowDependenceGraph fdg = new FlowDependenceGraph(dfg.eval());
-		return fdg.getSlice(selection, SliceDirection.REVERSE);
+		return fdg.getSlice(dataFlowNode, SliceDirection.REVERSE);
 	}
 
 }
