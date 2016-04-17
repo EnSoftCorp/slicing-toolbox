@@ -3,15 +3,22 @@ layout: default
 ---
 
 ## Overview
-TODO
+The Slicing Toolbox project provides Atlas native Program Dependence Graph (PDG) based program slicing.
 
 ## Features
-TODO
+The Slicing Toolbox project supports the following.
+
+- Forward Dominance Tree (Post Dominance) analysis
+- Reverse and forward Control Dependence Graph (CDG) slices
+- Reverse and forward Flow (Data) Dependence Graph (FDG) slices
+- Reverse and forward Program Dependence Graph (PDG) slices
+- Source to sink taint analysis
+- Convenient Smart Views for viewing slice and post dominance results
 
 ## Getting Started
 Ready to get started?
 
-1. First [install](/slicing-toolbox/install) the Call Graph Toolbox plugin
+1. First [install](/slicing-toolbox/install) the Slicing Toolbox plugin
 2. Then check out the provided [tutorials](/slicing-toolbox/tutorials) to jump start your analysis
 
 ## Source Code

@@ -4,14 +4,14 @@ title: Install
 permalink: /install/
 ---
 
-Installing the Call Graph Toolbox Eclipse plugin is easy.  It is recommended to install the plugin from the provided update site, but it is also possible to install from source.
+Installing the Slicing Toolbox Eclipse plugin is easy.  It is recommended to install the plugin from the provided update site, but it is also possible to install from source.
         
 ### Installing Dependencies
 1. First make sure you have [Atlas](http://www.ensoftcorp.com/atlas/download/) Standard or Pro installed.
 2. When installing Atlas make sure to also include Atlas Experimental features (to include Atlas for Jimple support).
         
 ### Installing from Update Site
-Follow the steps below to install the Call Graph Toolbox plugin from the Eclipse update site.
+Follow the steps below to install the Slicing Toolbox plugin from the Eclipse update site.
 
 1. Start Eclipse, then select `Help` &gt; `Install New Software`.
 2. Click `Add`, in the top-right corner.
