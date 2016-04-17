@@ -12,7 +12,6 @@ import com.ensoftcorp.atlas.java.core.script.Common;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
-import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 
 public abstract class SliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
@@ -25,14 +24,12 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 	public FrontierStyledResult evaluate(IAtlasSelectionEvent event, int reverse, int forward) {
 		Q filteredSelection = filter(event.getSelection());
 
-		if(filteredSelection.eval().nodes().size() != 1){
+		if(filteredSelection.eval().nodes().isEmpty()){
 			return null;
 		}
 		
-		GraphElement selection = filteredSelection.eval().nodes().getFirst();
-		GraphElement method = StandardQueries.getContainingMethod(selection);
-		
-		Q completeResult = getSlice(selection, method);
+		GraphElement selection = filteredSelection.eval().nodes().getFirst();	
+		Q completeResult = getSlice(selection);
 		
 		Highlighter h = new Highlighter();
 		h.highlight(Common.toQ(selection), Color.CYAN); 
@@ -52,7 +49,7 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 		return new com.ensoftcorp.atlas.core.script.FrontierStyledResult(result, frontierReverse, frontierForward, new MarkupFromH(h));
 	}
 
-	protected abstract Q getSlice(GraphElement selection, GraphElement method);
+	protected abstract Q getSlice(GraphElement selection);
 	
 	@Override
 	protected StyledResult selectionChanged(IAtlasSelectionEvent input, Q filteredSelection) {

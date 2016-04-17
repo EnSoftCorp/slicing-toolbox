@@ -37,7 +37,9 @@ public class PDGReverseSliceSmartView extends SliceSmartView {
 	}
 
 	@Override
-	protected Q getSlice(GraphElement dataFlowNode, GraphElement method) {
+	protected Q getSlice(GraphElement selection) {
+		GraphElement method = StandardQueries.getContainingMethod(selection);
+		
 		Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 		Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 		
@@ -45,7 +47,7 @@ public class PDGReverseSliceSmartView extends SliceSmartView {
 		Q dfg = Common.toQ(method).contained().induce(dataFlowEdges);
 		
 		ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
-		return pdg.getSlice(dataFlowNode, SliceDirection.REVERSE);
+		return pdg.getSlice(selection, SliceDirection.REVERSE);
 	}
 	
 	@Override
@@ -57,9 +59,8 @@ public class PDGReverseSliceSmartView extends SliceSmartView {
 		}
 		
 		GraphElement dataFlowNode = filteredSelection.eval().nodes().getFirst();
-		GraphElement method = StandardQueries.getContainingMethod(dataFlowNode);
 		
-		Q completeResult = getSlice(dataFlowNode, method);
+		Q completeResult = getSlice(dataFlowNode);
 		
 		Highlighter h = new Highlighter();
 		h.highlight(Common.toQ(dataFlowNode), Color.CYAN); 

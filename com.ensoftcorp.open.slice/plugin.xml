@@ -22,6 +22,9 @@
       <script
             class="com.ensoftcorp.open.slice.smart.PDGForwardSliceSmartView">
       </script>
+      <script
+            class="com.ensoftcorp.open.slice.smart.ForwardDominanceTreeSmartView">
+      </script>
    </extension>
 
 </plugin>

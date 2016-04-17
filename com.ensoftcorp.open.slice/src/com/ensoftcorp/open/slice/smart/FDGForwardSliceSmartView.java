@@ -5,6 +5,7 @@ import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
+import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 import com.ensoftcorp.open.slice.analysis.FlowDependenceGraph;
 
 public class FDGForwardSliceSmartView extends SliceSmartView {
@@ -30,11 +31,12 @@ public class FDGForwardSliceSmartView extends SliceSmartView {
 	}
 	
 	@Override
-	protected Q getSlice(GraphElement dataFlowNode, GraphElement method) {
+	protected Q getSlice(GraphElement selection) {
 		Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
+		GraphElement method = StandardQueries.getContainingMethod(selection);
 		Q dfg = Common.toQ(method).contained().induce(dataFlowEdges);
 		FlowDependenceGraph fdg = new FlowDependenceGraph(dfg.eval());
-		return fdg.getSlice(dataFlowNode, SliceDirection.FORWARD);
+		return fdg.getSlice(selection, SliceDirection.FORWARD);
 	}
 
 }
