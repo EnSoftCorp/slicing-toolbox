@@ -1,4 +1,4 @@
-package com.ensoftcorp.open.slice.common;
+package com.ensoftcorp.open.slice.analysis;
 
 import java.util.LinkedList;
 
@@ -8,9 +8,8 @@ import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
-import com.ensoftcorp.open.slice.analysis.ForwardDominanceTree;
 
-public class ControlDependenceGraph {
+public class ControlDependenceGraph extends DependenceGraph {
 
 	private Graph cfg;
 	private Graph fdt;
@@ -20,15 +19,16 @@ public class ControlDependenceGraph {
 		this.fdt = new ForwardDominanceTree(cfg).getForwardDominanceTree();
 	}
 	
-	public Q getControlDependenceGraph(){
+	public Q getGraph(){
 		Q result = Common.toQ(cfg).union(Common.toQ(fdt));
 		return result;
 	}
 	
-	public Q getControlDependenceGraphSlice(GraphElement controlFlowNode, boolean reverse){
+	@Override
+	public Q getSlice(GraphElement controlFlowNode, SliceDirection direction) {
 		AtlasSet<GraphElement> slice = new AtlasHashSet<GraphElement>();
 
-		if(reverse){
+		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
 			// first compute the reverse slice
 			LinkedList<GraphElement> reverseSliceQueue = new LinkedList<GraphElement>();
 			reverseSliceQueue.add(controlFlowNode);
@@ -45,7 +45,9 @@ public class ControlDependenceGraph {
 					}
 				}
 			}
-		} else {
+		} 
+		
+		else if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
 			// second compute the forward slice (which is just the reverse slice backwards...)
 			LinkedList<GraphElement> forwardSliceQueue = new LinkedList<GraphElement>();
 			forwardSliceQueue.add(controlFlowNode);
@@ -60,7 +62,7 @@ public class ControlDependenceGraph {
 				}
 			}
 		}
-
+		
 		return Common.toQ(slice).union(Common.toQ(controlFlowNode));
 	}
 	

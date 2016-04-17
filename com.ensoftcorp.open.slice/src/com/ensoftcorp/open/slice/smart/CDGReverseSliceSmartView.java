@@ -4,7 +4,8 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.slice.common.ControlDependenceGraph;
+import com.ensoftcorp.open.slice.analysis.ControlDependenceGraph;
+import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 
 public class CDGReverseSliceSmartView extends SliceSmartView {
 	
@@ -33,15 +34,7 @@ public class CDGReverseSliceSmartView extends SliceSmartView {
 		Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 		Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 		ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
-
-		// if the user selects the method we just show the whole cdg
-		Q completeResult = cdg.getControlDependenceGraph(); 
-		
-		// if the user selects a control flow node, then we show cdg slice for the selected statement
-		if(selection.taggedWith(XCSG.ControlFlow_Node)){
-			completeResult = cdg.getControlDependenceGraphSlice(selection, true);
-		}
-		return completeResult;
+		return cdg.getSlice(selection, SliceDirection.REVERSE);
 	}
 
 }

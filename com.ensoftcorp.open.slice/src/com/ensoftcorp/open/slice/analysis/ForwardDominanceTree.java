@@ -15,7 +15,10 @@ import com.ensoftcorp.open.slice.analysis.DominanceAnalysis.Multimap;
 
 public class ForwardDominanceTree implements UniqueEntryExitGraph {
 
-	private static final String FORWARD_DOMINANCE_EDGE = "ifdom";
+	/**
+	 * Used to tag the edges that immediately forward dominate (post-dominate) a node
+	 */
+	public static final String IMMEDIATE_FORWARD_DOMINANCE_EDGE = "ifdom";
 	
 	/**
 	 * The set of nodes in the current graph
@@ -44,12 +47,12 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 		for(Entry<GraphElement, Set<GraphElement>> entry : dominanceFrontier.entrySet()){
 			GraphElement toNode = entry.getKey();
 			for(GraphElement fromNode : entry.getValue()){
-				Q forwardDominanceEdges = Common.universe().edgesTaggedWithAny(FORWARD_DOMINANCE_EDGE);
+				Q forwardDominanceEdges = Common.universe().edgesTaggedWithAny(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
 				GraphElement forwardDominanceEdge = forwardDominanceEdges.betweenStep(Common.toQ(toNode), Common.toQ(fromNode)).eval().edges().getFirst();
 				if(forwardDominanceEdge == null){
 					forwardDominanceEdge = Graph.U.createEdge(fromNode, toNode);
-					forwardDominanceEdge.tag(FORWARD_DOMINANCE_EDGE);
-					forwardDominanceEdge.putAttr(XCSG.name, FORWARD_DOMINANCE_EDGE);
+					forwardDominanceEdge.tag(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
+					forwardDominanceEdge.putAttr(XCSG.name, IMMEDIATE_FORWARD_DOMINANCE_EDGE);
 				}
 				dominanceTree.add(forwardDominanceEdge);
 			}

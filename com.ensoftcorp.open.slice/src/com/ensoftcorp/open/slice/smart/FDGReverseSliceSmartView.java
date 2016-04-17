@@ -4,37 +4,37 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.slice.analysis.ControlDependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
+import com.ensoftcorp.open.slice.analysis.FlowDependenceGraph;
 
-public class CDGForwardSliceSmartView extends SliceSmartView {
+public class FDGReverseSliceSmartView extends SliceSmartView {
 	
 	@Override
 	protected String[] getSupportedNodeTags() {
-		return new String[]{XCSG.ControlFlow_Node};
+		return new String[]{XCSG.DataFlow_Node};
 	}
 
 	@Override
 	public int getDefaultStepTop() {
-		return 0;
+		return 1;
 	}
 	
 	@Override
 	public int getDefaultStepBottom() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public String getTitle() {
-		return "CDG Forward Slice";
+		return "FDG Reverse Slice";
 	}
 	
 	@Override
 	protected Q getSlice(GraphElement selection, GraphElement method) {
-		Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-		Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
-		ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
-		return cdg.getSlice(selection, SliceDirection.FORWARD);
+		Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
+		Q dfg = Common.toQ(method).contained().induce(dataFlowEdges);
+		FlowDependenceGraph fdg = new FlowDependenceGraph(dfg.eval());
+		return fdg.getSlice(selection, SliceDirection.REVERSE);
 	}
 
 }
