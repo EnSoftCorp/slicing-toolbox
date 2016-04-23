@@ -29,6 +29,10 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	 * The set of edges in the current graph
 	 */
 	private AtlasSet<GraphElement> edges;
+
+	private String[] entryNodeTags = { XCSG.controlFlowRoot };
+
+	private String[] exitNodeTags = { XCSG.controlFlowExitPoint } ;
 	
 	/** 
 	 * @param cfg a ControlFlowGraph (may include ExceptionalControlFlow_Edges)
@@ -40,15 +44,25 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 		this.edges().addAll(cfg.edges());
 	}
 	
+	public ForwardDominanceTree(Graph cfg, String[] entryNodeTags, String[] exitNodeTags) {
+		this.nodes = new AtlasHashSet<GraphElement>();
+		this.nodes().addAll(cfg.nodes());
+		this.edges = new AtlasHashSet<GraphElement>();
+		this.edges().addAll(cfg.edges());
+		
+		this.entryNodeTags = entryNodeTags;
+		this.exitNodeTags = exitNodeTags;
+	}
+	
 	public Graph getForwardDominanceTree(){
 		DominanceAnalysis dominanceAnalysis = new DominanceAnalysis(this, true);
-		Multimap<GraphElement> dominanceFrontier = dominanceAnalysis.getDominanceFrontiers();
+		Multimap<GraphElement> dominanceFrontier = dominanceAnalysis.getDominatorTree();
 		AtlasSet<GraphElement> dominanceTree = new AtlasHashSet<GraphElement>();
 		for(Entry<GraphElement, Set<GraphElement>> entry : dominanceFrontier.entrySet()){
-			GraphElement toNode = entry.getKey();
-			for(GraphElement fromNode : entry.getValue()){
+			GraphElement fromNode = entry.getKey();
+			for(GraphElement toNode : entry.getValue()){
 				Q forwardDominanceEdges = Common.universe().edgesTaggedWithAny(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
-				GraphElement forwardDominanceEdge = forwardDominanceEdges.betweenStep(Common.toQ(toNode), Common.toQ(fromNode)).eval().edges().getFirst();
+				GraphElement forwardDominanceEdge = forwardDominanceEdges.betweenStep(Common.toQ(fromNode), Common.toQ(toNode)).eval().edges().getFirst();
 				if(forwardDominanceEdge == null){
 					forwardDominanceEdge = Graph.U.createEdge(fromNode, toNode);
 					forwardDominanceEdge.tag(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
@@ -96,12 +110,12 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 
 	@Override
 	public GraphElement getEntryNode() {
-		return this.nodes().taggedWithAll(XCSG.controlFlowRoot).getFirst();
+		return this.nodes().taggedWithAny(entryNodeTags).getFirst();
 	}
 
 	@Override
 	public GraphElement getExitNode() {
-		return this.nodes().taggedWithAll(XCSG.controlFlowExitPoint).getFirst();
+		return this.nodes().taggedWithAll(exitNodeTags).getFirst();
 	}
 
 	@Override

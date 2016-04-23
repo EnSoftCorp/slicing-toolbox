@@ -11,10 +11,10 @@
             class="com.ensoftcorp.open.slice.smart.CDGForwardSliceSmartView">
       </script>
       <script
-            class="com.ensoftcorp.open.slice.smart.FDGReverseSliceSmartView">
+            class="com.ensoftcorp.open.slice.smart.DDGReverseSliceSmartView">
       </script>
       <script
-            class="com.ensoftcorp.open.slice.smart.FDGForwardSliceSmartView">
+            class="com.ensoftcorp.open.slice.smart.DDGForwardSliceSmartView">
       </script>
       <script
             class="com.ensoftcorp.open.slice.smart.PDGReverseSliceSmartView">
