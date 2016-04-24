@@ -5,6 +5,7 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
+import com.ensoftcorp.atlas.core.log.Log;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
@@ -42,6 +43,16 @@ public class DataDependenceGraph extends DependenceGraph {
 			GraphElement toStatement = to;
 			if(!toStatement.taggedWith(XCSG.ReturnValue)){
 				toStatement = getStatement(to);
+			}
+			
+			// sanity checks
+			if(fromStatement == null){
+				Log.warning("From node has no parent or is null: " + from.address().toAddressString());
+				continue;
+			}
+			if(toStatement == null){
+				Log.warning("To node has no parent or is null: " + to.address().toAddressString());
+				continue;
 			}
 			
 			// statement contains both data flow nodes
