@@ -23,15 +23,15 @@ public class ProgramDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(GraphElement dataFlowNode, SliceDirection direction) {
-		GraphElement controlFlowNode = DataDependenceGraph.getStatement(dataFlowNode);
+	public Q getSlice(GraphElement selection, SliceDirection direction) {
+		Q statement = Common.toQ(selection);
 		Q slice = Common.empty();
 		Q pdg = getGraph();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.reverse(Common.toQ(controlFlowNode)));
+			slice = slice.union(pdg.reverse(statement));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.forward(Common.toQ(controlFlowNode)));
+			slice = slice.union(pdg.forward(statement));
 		}
 		return slice;
 	}

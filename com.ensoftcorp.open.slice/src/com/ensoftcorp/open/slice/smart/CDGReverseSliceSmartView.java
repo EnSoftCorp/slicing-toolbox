@@ -9,11 +9,6 @@ import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 
 public class CDGReverseSliceSmartView extends SliceSmartView {
-	
-	@Override
-	protected String[] getSupportedNodeTags() {
-		return new String[]{XCSG.ControlFlow_Node};
-	}
 
 	@Override
 	public int getDefaultStepTop() {
@@ -32,13 +27,7 @@ public class CDGReverseSliceSmartView extends SliceSmartView {
 
 	@Override
 	protected Q getSlice(GraphElement selection) {
-		// convert the data flow node selection to a control flow node
-//		if(!Common.toQ(selection).nodesTaggedWithAny(XCSG.DataFlow_Node).eval().nodes().isEmpty()){
-//			selection = Common.toQ(selection).containers().nodesTaggedWithAny(XCSG.ControlFlow_Node).eval().nodes().getFirst();
-//		}
-		
 		GraphElement method = StandardQueries.getContainingMethod(selection);
-		
 		Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 		Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 		ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());

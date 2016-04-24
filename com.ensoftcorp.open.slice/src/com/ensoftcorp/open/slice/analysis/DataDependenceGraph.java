@@ -62,8 +62,8 @@ public class DataDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(GraphElement dataFlowNode, SliceDirection direction) {
-		Q statement = Common.toQ(getStatement(dataFlowNode));
+	public Q getSlice(GraphElement selection, SliceDirection direction) {
+		Q statement = Common.toQ(selection);
 		Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
 		Q slice = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){

@@ -9,11 +9,6 @@ import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 import com.ensoftcorp.open.slice.analysis.DataDependenceGraph;
 
 public class DDGForwardSliceSmartView extends SliceSmartView {
-	
-	@Override
-	protected String[] getSupportedNodeTags() {
-		return new String[]{XCSG.DataFlow_Node};
-	}
 
 	@Override
 	public int getDefaultStepTop() {

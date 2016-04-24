@@ -34,8 +34,10 @@ public class TaintGraph {
 			// build program dependence graph
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
+			
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
-			Q dfg = Common.toQ(method).contained().induce(dataFlowEdges);
+			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			
 			ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
 			
 			// taint graph is the forward taint of the source intersected with the reverse taint of the sink

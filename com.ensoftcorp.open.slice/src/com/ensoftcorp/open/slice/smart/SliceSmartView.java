@@ -1,20 +1,23 @@
 package com.ensoftcorp.open.slice.smart;
 
-import java.awt.Color;
-
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.FrontierStyledResult;
 import com.ensoftcorp.atlas.core.script.StyledResult;
-import com.ensoftcorp.atlas.java.core.script.Common;
+import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
 
 public abstract class SliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
+	@Override
+	protected String[] getSupportedNodeTags() {
+		return new String[] { XCSG.ControlFlow_Node };
+	}
+	
 	@Override
 	protected String[] getSupportedEdgeTags() {
 		return NOTHING;
@@ -28,11 +31,11 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 			return null;
 		}
 		
-		GraphElement selection = filteredSelection.eval().nodes().getFirst();	
+		GraphElement selection = filteredSelection.eval().nodes().getFirst();
+		
 		Q completeResult = getSlice(selection);
 		
 		Highlighter h = new Highlighter();
-		h.highlight(Common.toQ(selection), Color.CYAN); 
 
 		// compute what to show for current steps
 		Q f = filteredSelection.forwardStepOn(completeResult, forward);

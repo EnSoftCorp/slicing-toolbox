@@ -165,7 +165,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 	}
 	
 	public Q getGraph(){
-		return Common.toQ(cdg);
+		return Common.toQ(cdg).difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
 	}
 	
 	@Override
@@ -178,7 +178,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
 			slice = slice.union(controlDependenceEdges.forward(Common.toQ(controlFlowNode)));
 		}
-		return slice;
+		return slice.difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
 	}
 	
 }

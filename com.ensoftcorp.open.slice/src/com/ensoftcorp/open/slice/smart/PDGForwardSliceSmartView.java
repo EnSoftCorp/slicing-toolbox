@@ -11,11 +11,6 @@ import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 public class PDGForwardSliceSmartView extends SliceSmartView {
 	
 	@Override
-	protected String[] getSupportedNodeTags() {
-		return new String[]{XCSG.DataFlow_Node};
-	}
-
-	@Override
 	public int getDefaultStepTop() {
 		return 0;
 	}
