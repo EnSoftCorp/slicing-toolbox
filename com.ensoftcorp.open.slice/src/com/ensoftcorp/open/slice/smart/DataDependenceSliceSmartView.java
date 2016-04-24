@@ -53,18 +53,18 @@ public class DataDependenceSliceSmartView extends FilteringAtlasSmartViewScript 
 		}
 		
 		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
-		Q completeResult = Common.toQ(criteria);
+		Q completeResult = Common.empty();
 		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
-			Q relevantCriteria = Common.toQ(method).contained().intersection(Common.toQ(criteria));
+			AtlasSet<GraphElement> relevantCriteria = Common.toQ(method).contained().intersection(Common.toQ(criteria)).eval().nodes();
 			DataDependenceGraph ddg = DependenceGraph.Factory.buildDDG(method);
-			completeResult = Common.toQ(completeResult.union(ddg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());
+			completeResult = completeResult.union(ddg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria));
 		}
 		
 		// compute what to show for current steps
 		Q statements = filteredSelection.parent(); // result is a statement (control flow) level graph
 		Q f = statements.forwardStepOn(completeResult, forward);
 		Q r = statements.reverseStepOn(completeResult, reverse);
-		Q result = f.union(r);
+		Q result = f.union(r).union(Common.toQ(criteria));
 		
 		// compute what is on the frontier
 		Q frontierForward = statements.forwardStepOn(completeResult, forward+1);

@@ -1,6 +1,9 @@
 package com.ensoftcorp.open.slice.smart;
 
+import java.awt.Color;
+
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
@@ -26,7 +29,7 @@ public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 	
 	@Override
 	protected String[] getSupportedNodeTags() {
-		return new String[] { XCSG.ControlFlow_Node };
+		return new String[] { XCSG.ControlFlow_Node, XCSG.DataFlow_Node };
 	}
 	
 	@Override
@@ -53,6 +56,15 @@ public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 		}
 		
 		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
+		AtlasSet<GraphElement> statements = new AtlasHashSet<GraphElement>();
+		for(GraphElement criterion : criteria){
+			if(criterion.taggedWith(XCSG.DataFlow_Node)){
+				statements.add(Common.toQ(criterion).parent().eval().nodes().getFirst());
+			} else {
+				statements.add(criterion);
+			}
+		}
+		criteria = statements;
 		
 		Q completeResult = Common.empty();
 		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
@@ -61,19 +73,24 @@ public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 			completeResult = Common.toQ(completeResult.union(cdg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());
 		}
 		
+		// make sure the selected criteria is highlighted 
+		// (since it may have been computed and not be what the user actually selected)
+		Highlighter h = new Highlighter();
+		h.highlight(Common.toQ(criteria), Color.CYAN);
+		
 		// compute what to show for current steps
-		Q f = filteredSelection.forwardStepOn(completeResult, forward);
-		Q r = filteredSelection.reverseStepOn(completeResult, reverse);
-		Q result = f.union(r);
+		Q f = Common.toQ(criteria).forwardStepOn(completeResult, forward);
+		Q r = Common.toQ(criteria).reverseStepOn(completeResult, reverse);
+		Q result = f.union(r).union(Common.toQ(criteria));
 		
 		// compute what is on the frontier
-		Q frontierForward = filteredSelection.forwardStepOn(completeResult, forward+1);
+		Q frontierForward = Common.toQ(criteria).forwardStepOn(completeResult, forward+1);
 		frontierForward = frontierForward.retainEdges().differenceEdges(result);
 		
-		Q frontierReverse = filteredSelection.reverseStepOn(completeResult, reverse+1);
+		Q frontierReverse = Common.toQ(criteria).reverseStepOn(completeResult, reverse+1);
 		frontierReverse = frontierReverse.retainEdges().differenceEdges(result);
 
-		return new com.ensoftcorp.atlas.core.script.FrontierStyledResult(result, frontierReverse, frontierForward, new MarkupFromH(new Highlighter()));
+		return new com.ensoftcorp.atlas.core.script.FrontierStyledResult(result, frontierReverse, frontierForward, new MarkupFromH(h));
 	}
 
 	@Override
