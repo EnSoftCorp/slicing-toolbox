@@ -54,7 +54,7 @@ public class ProgramDependenceGraph extends DependenceGraph {
 		boolean fixedPoint = false;
 		while(!fixedPoint){
 			AtlasSet<GraphElement> newCriteriaStatements = slice.nodesTaggedWithAny(XCSG.ControlFlow_Node).difference(oldCriteria).eval().nodes();
-			AtlasSet<GraphElement> newCriteria = Common.toQ(newCriteriaStatements).contained().nodesTaggedWithAny(XCSG.DataFlow_Node, XCSG.Parameter).difference(oldCriteria).eval().nodes();
+			AtlasSet<GraphElement> newCriteria = Common.toQ(newCriteriaStatements).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).difference(oldCriteria).eval().nodes();
 			slice = slice.union(ddg.getSlice(direction, newCriteria).union(cdg.getSlice(direction, newCriteriaStatements)));
 			oldCriteria = Common.toQ(newCriteria).union(Common.toQ(newCriteriaStatements));
 			
