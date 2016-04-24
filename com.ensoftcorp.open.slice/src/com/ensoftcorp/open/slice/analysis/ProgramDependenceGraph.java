@@ -5,6 +5,7 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
+import com.ensoftcorp.atlas.core.xcsg.XCSG;
 
 public class ProgramDependenceGraph extends DependenceGraph {
 
@@ -25,13 +26,48 @@ public class ProgramDependenceGraph extends DependenceGraph {
 
 	@Override
 	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
-		Q slice = Common.empty();
-		Q pdg = getGraph();
-		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.reverse(Common.toQ(criteria)));
-		} 
-		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.forward(Common.toQ(criteria)));
+		if(direction == SliceDirection.BI_DIRECTIONAL){
+			return slice(SliceDirection.REVERSE, criteria).union(slice(SliceDirection.FORWARD, criteria));
+		} else {
+			return slice(direction, criteria);
+		}
+	}
+
+	/**
+	 * Helper method to break up slicing into only forward or reverse operations
+	 * @param direction
+	 * @param criteria
+	 * @return
+	 */
+	private Q slice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+		if(direction == SliceDirection.BI_DIRECTIONAL){
+			throw new RuntimeException("Bi-directional slicing must be done stepwise...");
+		}
+		Q criteriaStatements = Common.toQ(criteria).parent();
+		Q slice = ddg.getSlice(direction, criteria).union(cdg.getSlice(direction, criteriaStatements.eval().nodes()));
+		Q oldCriteria = Common.toQ(criteria).union(criteriaStatements);
+		
+		// iteratively slice on CDG and DDG of newly reached statements
+		// until nothing new is learned
+		long numSliceNodes = slice.eval().nodes().size();
+		long numSliceEdges = slice.eval().edges().size();
+		boolean fixedPoint = false;
+		while(!fixedPoint){
+			AtlasSet<GraphElement> newCriteriaStatements = slice.nodesTaggedWithAny(XCSG.ControlFlow_Node).difference(oldCriteria).eval().nodes();
+			AtlasSet<GraphElement> newCriteria = Common.toQ(newCriteriaStatements).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).difference(oldCriteria).eval().nodes();
+			slice = slice.union(ddg.getSlice(direction, newCriteria).union(cdg.getSlice(direction, newCriteriaStatements)));
+			oldCriteria = Common.toQ(newCriteria).union(Common.toQ(newCriteriaStatements));
+			
+			Graph currentSlice = slice.eval();
+			long currentNumSliceNodes = currentSlice.nodes().size();
+			long currentNumSliceEdges = currentSlice.edges().size();
+			if(currentNumSliceNodes == numSliceNodes && currentNumSliceEdges == numSliceEdges){
+				fixedPoint = true;
+			} else {
+				numSliceNodes = currentNumSliceNodes;
+				numSliceEdges = currentNumSliceEdges;
+			}
+			slice = Common.toQ(currentSlice);
 		}
 		return slice;
 	}

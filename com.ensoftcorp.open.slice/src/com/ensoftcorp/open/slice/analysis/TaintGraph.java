@@ -6,7 +6,6 @@ import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
-import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 
@@ -34,13 +33,7 @@ public class TaintGraph {
 			GraphElement method = sourceMethod;
 			
 			// build program dependence graph
-			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
-			
-			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
-			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
-			
-			ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
+			ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
 			
 			// taint graph is the forward taint of the source intersected with the reverse taint of the sink
 			AtlasSet<GraphElement> sources = new AtlasHashSet<GraphElement>();
