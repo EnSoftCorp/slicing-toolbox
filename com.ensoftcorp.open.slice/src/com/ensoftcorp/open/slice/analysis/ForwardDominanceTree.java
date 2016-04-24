@@ -32,7 +32,7 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 
 	private String[] entryNodeTags = { XCSG.controlFlowRoot };
 
-	private String[] exitNodeTags = { XCSG.controlFlowExitPoint } ;
+	private String[] exitNodeTags = { XCSG.controlFlowExitPoint }; // may have multiple exit points...
 	
 	/** 
 	 * @param cfg a ControlFlowGraph (may include ExceptionalControlFlow_Edges)

@@ -8,7 +8,6 @@ import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.atlas.java.core.script.CommonQueries;
 
 /**
  * 
@@ -18,7 +17,6 @@ import com.ensoftcorp.atlas.java.core.script.CommonQueries;
  * 
  * Reference: 
  * 1) http://www.cc.gatech.edu/~harrold/6340/cs6340_fall2009/Slides/BasicAnalysis4.pdf
- * 2) http://www.cc.gatech.edu/~harrold/6340/cs6340_fall2009/Slides/BasicAnalysis5.pdf
  * 
  * @author Ben Holland
  */
@@ -112,25 +110,32 @@ public class ControlDependenceGraph extends DependenceGraph {
 		String[] exitTags = new String[] { CFG_EXIT };
 		this.fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
 		
-		// for each edge (X->Y) in the augmented CFG
-		// Y is control dependent on X iff there is a path in the CFG
-		// from X to Y that doesn't contain the immediate forward 
-		// dominator of X
+		// For each edge (X -> Y) in augmented CFG, 
+		// find nodes in the forward dominance tree from Y
+		// to the least common ancestor (LCA) of X and Y 
+		// (including LCA if LCA is X and excluding LCA if LCA is not X)
 		AtlasSet<GraphElement> controlDependenceEdgeSet = new AtlasHashSet<GraphElement>();
 		for(GraphElement cfEdge : augmentedCFG.edges()){
 			GraphElement x = cfEdge.getNode(EdgeDirection.FROM);
 			GraphElement y = cfEdge.getNode(EdgeDirection.TO);
 			
-			// get forward dominator of X
-			Q fdx = Common.toQ(fdt).successors(Common.toQ(x));
-			// paths from X to Y that don't contain immediate forward dominator of x
-			Q paths = Common.toQ(augmentedCFG).difference(fdx).between(Common.toQ(x), Common.toQ(y));
-			if(!CommonQueries.isEmpty(paths)){
-				// Y is control dependent on X
+			// least common ancestor in forward dominance tree
+			GraphElement lca = leastCommonAncestor(x, y, fdt);
+			
+			// nodes between lca -> Y (nodes dependent on X)
+			AtlasSet<GraphElement> nodesControlDependentOnX = new AtlasHashSet<GraphElement>();
+			nodesControlDependentOnX.addAll(Common.toQ(fdt).between(Common.toQ(lca), Common.toQ(y)).eval().nodes());
+			// remove LCA if LCA is not X
+			if(!lca.equals(x)){
+				nodesControlDependentOnX.remove(lca);
+			}
+			
+			// add control dependence edges
+			for(GraphElement node : nodesControlDependentOnX){
 				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
-				GraphElement controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(y), Common.toQ(x)).eval().edges().getFirst();
+				GraphElement controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().getFirst();
 				if(controlDependenceEdge == null){
-					controlDependenceEdge = Graph.U.createEdge(y, x);
+					controlDependenceEdge = Graph.U.createEdge(x, node);
 					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
 					controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);
 				}
@@ -138,7 +143,13 @@ public class ControlDependenceGraph extends DependenceGraph {
 			}
 		}
 		
-		this.cdg = Common.toGraph(controlDependenceEdgeSet);
+		this.cdg = Common.toQ(controlDependenceEdgeSet).eval();
+	}
+	
+	private GraphElement leastCommonAncestor(GraphElement child1, GraphElement child2, Graph graph){
+		Q g = Common.toQ(graph);
+		Q ancestors = g.reverse(Common.toQ(child1)).intersection(g.reverse(Common.toQ(child2)));
+		return ancestors.leaves().eval().nodes().getFirst();
 	}
 	
 	public Q getControlFlowGraph(){
