@@ -12,10 +12,10 @@ The Slicing Toolbox project supports the following.
 
 - Forward Dominance Tree ([Post Dominance](https://en.wikipedia.org/wiki/Dominator_(graph_theory)#Postdominance)) analysis
 - Reverse and forward Control Dependence Graph (CDG) slices
-- Reverse and forward Flow (Data) Dependence Graph (FDG) slices
+- Reverse and forward Data Dependence Graph (DDG) slices
 - Reverse and forward Program Dependence Graph (PDG) slices
-- Convenient Smart Views for viewing slice and post dominance results
-- Source to sink taint analysis
+- Convenient Smart Views for viewing slice results
+- Source to sink taint analysis (includes implicit data flow)
 
 ## Getting Started
 Ready to get started?
