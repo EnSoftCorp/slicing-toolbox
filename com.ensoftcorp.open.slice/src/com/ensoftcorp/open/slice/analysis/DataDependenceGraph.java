@@ -20,6 +20,13 @@ public class DataDependenceGraph extends DependenceGraph {
 	private Graph ddg; // data dependency graph
 	
 	public DataDependenceGraph(Graph dfg){
+		// sanity checks
+		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
+			this.dfg = Common.toQ(dfg).eval();
+			this.ddg = Common.empty().eval();
+			return;
+		}
+		
 		this.dfg = dfg;
 		
 		AtlasSet<GraphElement> dataDependenceEdgeSet = new AtlasHashSet<GraphElement>();

@@ -43,6 +43,14 @@ public class ControlDependenceGraph extends DependenceGraph {
 	private Graph cdg;
 	
 	public ControlDependenceGraph(Graph cfg){
+		// sanity checks
+		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
+			this.cdg = Common.toQ(cfg).eval();
+			this.fdt = Common.empty().eval();
+			this.augmentedCFG = Common.toQ(cfg).eval();
+			return;
+		}
+		
 		// augment the cfg with a master entry node and a master exit node
 		GraphElement cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
 		AtlasSet<GraphElement> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
