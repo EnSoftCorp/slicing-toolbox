@@ -41,7 +41,10 @@ public abstract class DependenceGraph {
 		 */
 		public static DataDependenceGraph buildDDG(GraphElement method){
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
+			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
 			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
+			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 			return ddg;
 		}
@@ -56,7 +59,10 @@ public abstract class DependenceGraph {
 			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 			
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
+			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
 			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
+			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			
 			ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
 			return pdg;

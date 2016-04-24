@@ -1,9 +1,12 @@
 package com.ensoftcorp.open.slice.analysis;
 
+import java.awt.Color;
+
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
+import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
@@ -42,7 +45,7 @@ public class TaintGraph {
 			AtlasSet<GraphElement> sinks = new AtlasHashSet<GraphElement>();
 			sinks.add(sink);
 			Q reverseTaintSlice = pdg.getSlice(SliceDirection.REVERSE, sinks);
-			taintGraph = forwardTaintSlice.intersection(reverseTaintSlice).eval();
+			taintGraph = forwardTaintSlice.intersection(reverseTaintSlice).union(Common.toQ(source), Common.toQ(sink)).eval();
 		}
 	}
 
@@ -58,4 +61,10 @@ public class TaintGraph {
 		return Common.toQ(taintGraph);
 	}
 	
+	public Highlighter getHighlighter(){
+		Highlighter h = new Highlighter();
+		h.highlight(Common.toQ(getSource()), Color.BLUE);
+		h.highlight(Common.toQ(getSink()), Color.RED);
+		return h;
+	}
 }

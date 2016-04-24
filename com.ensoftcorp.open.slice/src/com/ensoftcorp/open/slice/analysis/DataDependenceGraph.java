@@ -20,18 +20,27 @@ public class DataDependenceGraph extends DependenceGraph {
 	private Graph ddg; // data dependency graph
 	
 	public DataDependenceGraph(Graph dfg){
-		dfg = Common.toQ(dfg).edgesTaggedWithAny(XCSG.DataFlow_Edge).retainEdges().eval();
 		this.dfg = dfg;
 		
 		AtlasSet<GraphElement> dataDependenceEdgeSet = new AtlasHashSet<GraphElement>();
 		for(GraphElement dfEdge : dfg.edges()){
+			
 			GraphElement from = dfEdge.getNode(EdgeDirection.FROM);
-			GraphElement fromStatement = getStatement(from);
+			GraphElement fromStatement = from;
+			if(!fromStatement.taggedWith(XCSG.Parameter)){
+				fromStatement = getStatement(from);
+			}
 			
 			GraphElement to = dfEdge.getNode(EdgeDirection.TO);
-			GraphElement toStatement = getStatement(to);
+			GraphElement toStatement = to;
+			if(!toStatement.taggedWith(XCSG.ReturnValue)){
+				toStatement = getStatement(to);
+			}
 			
 			// statement contains both data flow nodes
+			// this is a little noisy to create relationships to all the time
+			// example: "x = 1;" is a single statement with a data dependence from 1 to x
+			// skip the trivial edges
 			if(fromStatement.equals(toStatement)){
 				continue;
 			}
@@ -64,15 +73,16 @@ public class DataDependenceGraph extends DependenceGraph {
 	@Override
 	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
 		Q dataFlowEdges = Common.toQ(dfg);
-		Q dataFlowNodes = Common.empty();
+		Q relevantDataFlowNodes = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			dataFlowNodes = dataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			dataFlowNodes = dataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
 		}
 		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
-		Q relevantStatements = containsEdges.predecessors(dataFlowNodes);
+		Q relevantStatements = containsEdges.predecessors(relevantDataFlowNodes)
+				.union(relevantDataFlowNodes.nodesTaggedWithAny(XCSG.Parameter, XCSG.ReturnValue));
 		Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
 		Q slice = relevantStatements.induce(dataDependenceEdges);
 		return slice;

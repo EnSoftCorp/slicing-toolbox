@@ -26,7 +26,7 @@ public class DataDependenceSliceSmartView extends FilteringAtlasSmartViewScript 
 	
 	@Override
 	protected String[] getSupportedNodeTags() {
-		return new String[] { XCSG.DataFlow_Node };
+		return new String[] { XCSG.DataFlow_Node, XCSG.Parameter };
 	}
 	
 	@Override
@@ -55,13 +55,16 @@ public class DataDependenceSliceSmartView extends FilteringAtlasSmartViewScript 
 		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
 		Q completeResult = Common.empty();
 		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
-			AtlasSet<GraphElement> relevantCriteria = Common.toQ(method).contained().intersection(Common.toQ(criteria)).eval().nodes();
 			DataDependenceGraph ddg = DependenceGraph.Factory.buildDDG(method);
+			AtlasSet<GraphElement> relevantCriteria = ddg.getGraph().intersection(Common.toQ(criteria)).eval().nodes();
 			completeResult = completeResult.union(ddg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria));
 		}
 		
+		// result is a statement (control flow) level graph with the exception of parameters and return values
+		Q statements = filteredSelection.parent()
+				.union(filteredSelection.nodesTaggedWithAny(XCSG.Parameter, XCSG.ReturnValue)); 
+		
 		// compute what to show for current steps
-		Q statements = filteredSelection.parent(); // result is a statement (control flow) level graph
 		Q f = statements.forwardStepOn(completeResult, forward);
 		Q r = statements.reverseStepOn(completeResult, reverse);
 		Q result = f.union(r).union(Common.toQ(criteria));
