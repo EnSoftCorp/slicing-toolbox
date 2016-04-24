@@ -36,19 +36,21 @@ The CDG is constructed using the Ferrante, Ottenstein, and Warren (FOW) algorith
 
 	show(cdg.getAugmentedControlFlowGraph())
 
-![Augmented CFG](./images/augmented-cfg.png)
+
+![Augmented CFG](../images/augmented-cfg.png)
 
  Using the augmented CFG a forward dominance analysis (post-dominance) is performed.
  
   	show(cdg.getForwardDominanceTree())
 
-![Forward Dominance Tree](./images/fdt.png)
+
+![Forward Dominance Tree](../images/fdt.png)
 
   	show(cdg.getGraph())
 
 For each edge (X -&gt; Y) in augmented CFG, we find the nodes in the forward dominance tree from Y to the least common ancestor (LCA) of X and Y. We include LCA if LCA is X and exclude LCA if LCA is not X. For the resulting set of nodes, we add a control dependence edge from X to the node.
 
-![Control Dependence Graph](./images/cdg.png)
+![Control Dependence Graph](../images/cdg.png)
 
 	DataDependenceGraph ddg = DependenceGraph.Factory.buildDDG(method);
 
@@ -56,14 +58,15 @@ The DDG is computed by adding data dependence edges to statements that contain d
 
   	show(ddg.getGraph())
 
-![Data Dependence Graph](./images/ddg.png)
+
+![Data Dependence Graph](../images/ddg.png)
 
 The Program Dependence Graph (PDG) is created by combining the Control Dependence Graph and Data Dependence Graph (CDG union DDG).
 
 	ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
 	show(pdg.getGraph())
 
-![Program Dependence Graph](./images/pdg.png)
+![Program Dependence Graph](../images/pdg.png)
 
 ## Impact Analysis
 
