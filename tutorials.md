@@ -71,7 +71,10 @@ While a reverse program slice shows what was relevant to compute the values of t
 
 ![Impact Analysis](../images/impact-analysis.png)
 
-## Taint Analysis
-TODO
+## Taint Analysis (Program Chopping)
+
+By intersecting the forward program slice with respect to one criteria (source) and the reverse program slice with respect to another criteria (sink) we can determine if one variable taints another in the program. A taint analysis could be used to address the implicit data flow example shown below.
+
+{% gist ebc83bc5670272b568c1 %}
 
 ![Taint Analysis](../images/taint-analysis.png)
