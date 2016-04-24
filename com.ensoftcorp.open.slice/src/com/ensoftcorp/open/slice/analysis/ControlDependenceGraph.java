@@ -1,14 +1,14 @@
 package com.ensoftcorp.open.slice.analysis;
 
-import java.util.LinkedList;
-
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
+import com.ensoftcorp.atlas.java.core.script.CommonQueries;
 
 /**
  * 
@@ -24,6 +24,11 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
  */
 public class ControlDependenceGraph extends DependenceGraph {
 
+	/**
+	 * Used to tag the edges between nodes that contain a control dependence
+	 */
+	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
+	
 	private GraphElement master;
 	private GraphElement entry;
 	private GraphElement exit;
@@ -35,14 +40,13 @@ public class ControlDependenceGraph extends DependenceGraph {
 	private static final String AUGMENTATION_NODE = "augmentation-node";
 	private static final String AUGMENTATION_EDGE = "augmentation-edge";
 	
-	private Graph cfg;
 	private Graph augmentedCFG;
 	private Graph fdt;
+	private Graph cdg;
 	
 	public ControlDependenceGraph(Graph cfg){
 		cfg = Common.toQ(cfg).edgesTaggedWithAny(XCSG.ControlFlow_Edge).retainEdges().eval();
-		this.cfg = cfg;
-		
+
 		// augment the cfg with a master entry node and a master exit node
 		GraphElement cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
 		AtlasSet<GraphElement> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
@@ -108,70 +112,62 @@ public class ControlDependenceGraph extends DependenceGraph {
 		String[] exitTags = new String[] { CFG_EXIT };
 		this.fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
 		
-		// reference: http://www.cc.gatech.edu/~harrold/6340/cs6340_fall2009/Slides/BasicAnalysis4.pdf
-		// given the CFG, Y is control dependent on X iff 
-		// 1) there exists a path P from X to Y in the CFG with any Z (excluding X,Y) in P post-dominated by Y
-		// 2) X is not post-dominated by Y
+		// for each edge (X->Y) in the augmented CFG
+		// Y is control dependent on X iff there is a path in the CFG
+		// from X to Y that doesn't contain the immediate forward 
+		// dominator of X
+		AtlasSet<GraphElement> controlDependenceEdgeSet = new AtlasHashSet<GraphElement>();
+		for(GraphElement cfEdge : augmentedCFG.edges()){
+			GraphElement x = cfEdge.getNode(EdgeDirection.FROM);
+			GraphElement y = cfEdge.getNode(EdgeDirection.TO);
+			
+			// get forward dominator of X
+			Q fdx = Common.toQ(fdt).successors(Common.toQ(x));
+			// paths from X to Y that don't contain immediate forward dominator of x
+			Q paths = Common.toQ(augmentedCFG).difference(fdx).between(Common.toQ(x), Common.toQ(y));
+			if(!CommonQueries.isEmpty(paths)){
+				// Y is control dependent on X
+				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
+				GraphElement controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(y), Common.toQ(x)).eval().edges().getFirst();
+				if(controlDependenceEdge == null){
+					controlDependenceEdge = Graph.U.createEdge(y, x);
+					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
+					controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);
+				}
+				controlDependenceEdgeSet.add(controlDependenceEdge);
+			}
+		}
 		
-		// There are two edges out of X
-		// traversing one edge always leads to Y,
-		// traversing the other edge the other may not lead to Y
-		
+		this.cdg = Common.toGraph(controlDependenceEdgeSet);
+	}
+	
+	public Q getControlFlowGraph(){
+		return Common.toQ(augmentedCFG).difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
 	}
 	
 	public Q getAugmentedControlFlowGraph(){
 		return Common.toQ(augmentedCFG);
 	}
 	
-	public Q getAugmentedForwardDominanceTree(){
+	public Q getForwardDominanceTree(){
 		return Common.toQ(fdt);
 	}
 	
 	public Q getGraph(){
-		Q result = Common.toQ(cfg).union(Common.toQ(fdt));
-		return result;
+		return Common.toQ(cdg);
 	}
 	
 	@Override
 	public Q getSlice(GraphElement controlFlowNode, SliceDirection direction) {
-		AtlasSet<GraphElement> slice = new AtlasHashSet<GraphElement>();
-
+		Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
+		Q slice = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			// first compute the reverse slice
-			LinkedList<GraphElement> reverseSliceQueue = new LinkedList<GraphElement>();
-			reverseSliceQueue.add(controlFlowNode);
-			// Y is control dependent on X iff there is a path in the CFG
-			// from X to Y that doesn't contain the immediate forward 
-			// dominator of X
-			while(!reverseSliceQueue.isEmpty()){
-				GraphElement y = reverseSliceQueue.removeFirst();
-				for(GraphElement x : Common.toQ(cfg).predecessors(Common.toQ(y)).eval().nodes()){
-					Q fdx = Common.toQ(fdt).successors(Common.toQ(x));
-					Q cfgPathsXToY = Common.toQ(cfg).difference(fdx).betweenStep(Common.toQ(x), Common.toQ(y));
-					if(slice.addAll(cfgPathsXToY.eval().edges())){
-						reverseSliceQueue.add(x);
-					}
-				}
-			}
+			slice = slice.union(controlDependenceEdges.reverse(Common.toQ(controlFlowNode)));
 		} 
-		
-		else if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			// second compute the forward slice (which is just the reverse slice backwards...)
-			LinkedList<GraphElement> forwardSliceQueue = new LinkedList<GraphElement>();
-			forwardSliceQueue.add(controlFlowNode);
-			while(!forwardSliceQueue.isEmpty()){
-				GraphElement x = forwardSliceQueue.removeFirst();
-				for(GraphElement y : Common.toQ(cfg).successors(Common.toQ(x)).eval().nodes()){
-					Q fdx = Common.toQ(fdt).predecessors(Common.toQ(y));
-					Q cfgPathsXToY = Common.toQ(cfg).difference(fdx).betweenStep(Common.toQ(x), Common.toQ(y));
-					if(slice.addAll(cfgPathsXToY.eval().edges())){
-						forwardSliceQueue.add(y);
-					}
-				}
-			}
+		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
+			slice = slice.union(controlDependenceEdges.forward(Common.toQ(controlFlowNode)));
 		}
-		
-		return Common.toQ(slice).union(Common.toQ(controlFlowNode));
+		return slice;
 	}
 	
 }
