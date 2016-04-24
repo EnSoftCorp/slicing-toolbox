@@ -5,6 +5,7 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
+import com.ensoftcorp.atlas.core.log.Log;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
@@ -127,6 +128,12 @@ public class ControlDependenceGraph extends DependenceGraph {
 			
 			// least common ancestor in forward dominance tree
 			GraphElement lca = leastCommonAncestor(x, y, fdt);
+			
+			// sanity check
+			if(lca == null){
+				Log.warning("No common ancestor of " + x.address().toAddressString() + " and " + y.address().toAddressString());
+				continue;
+			}
 			
 			// nodes between lca -> Y (nodes dependent on X)
 			AtlasSet<GraphElement> nodesControlDependentOnX = new AtlasHashSet<GraphElement>();
