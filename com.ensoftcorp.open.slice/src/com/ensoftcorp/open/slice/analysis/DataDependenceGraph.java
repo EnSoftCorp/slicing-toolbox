@@ -62,18 +62,19 @@ public class DataDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(GraphElement selection, SliceDirection direction) {
-		Q statement = Common.toQ(selection);
-		Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
-		Q slice = Common.empty();
+	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+		Q dataFlowEdges = Common.toQ(dfg);
+		Q dataFlowNodes = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-//			slice = slice.union(Common.toQ(dfg).reverse(Common.toQ(dataFlowNode)));
-			slice = slice.union(dataDependenceEdges.reverse(statement));
+			dataFlowNodes = dataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-//			slice = slice.union(Common.toQ(dfg).forward(Common.toQ(dataFlowNode)));
-			slice = slice.union(dataDependenceEdges.forward(statement));
+			dataFlowNodes = dataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
 		}
+		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
+		Q relevantStatements = containsEdges.predecessors(dataFlowNodes);
+		Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
+		Q slice = relevantStatements.induce(dataDependenceEdges);
 		return slice;
 	}
 	

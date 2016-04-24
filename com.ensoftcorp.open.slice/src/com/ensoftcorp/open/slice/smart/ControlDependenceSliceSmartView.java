@@ -1,18 +1,29 @@
 package com.ensoftcorp.open.slice.smart;
 
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.script.FrontierStyledResult;
 import com.ensoftcorp.atlas.core.script.StyledResult;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
+import com.ensoftcorp.open.slice.analysis.ControlDependenceGraph;
+import com.ensoftcorp.open.slice.analysis.DependenceGraph;
+import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
+import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
 
-public abstract class SliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
+public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
+	@Override
+	public String getTitle() {
+		return "Control Dependence Slice";
+	}
+	
 	@Override
 	protected String[] getSupportedNodeTags() {
 		return new String[] { XCSG.ControlFlow_Node };
@@ -21,6 +32,16 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 	@Override
 	protected String[] getSupportedEdgeTags() {
 		return NOTHING;
+	}
+	
+	@Override
+	public int getDefaultStepTop() {
+		return 1;
+	}
+	
+	@Override
+	public int getDefaultStepBottom() {
+		return 0;
 	}
 
 	@Override
@@ -31,12 +52,15 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 			return null;
 		}
 		
-		GraphElement selection = filteredSelection.eval().nodes().getFirst();
+		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
 		
-		Q completeResult = getSlice(selection);
+		Q completeResult = Common.empty();
+		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
+			Q relevantCriteria = Common.toQ(method).contained().intersection(Common.toQ(criteria));
+			ControlDependenceGraph cdg = DependenceGraph.Factory.buildCDG(method);
+			completeResult = Common.toQ(completeResult.union(cdg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());
+		}
 		
-		Highlighter h = new Highlighter();
-
 		// compute what to show for current steps
 		Q f = filteredSelection.forwardStepOn(completeResult, forward);
 		Q r = filteredSelection.reverseStepOn(completeResult, reverse);
@@ -49,11 +73,9 @@ public abstract class SliceSmartView extends FilteringAtlasSmartViewScript imple
 		Q frontierReverse = filteredSelection.reverseStepOn(completeResult, reverse+1);
 		frontierReverse = frontierReverse.retainEdges().differenceEdges(result);
 
-		return new com.ensoftcorp.atlas.core.script.FrontierStyledResult(result, frontierReverse, frontierForward, new MarkupFromH(h));
+		return new com.ensoftcorp.atlas.core.script.FrontierStyledResult(result, frontierReverse, frontierForward, new MarkupFromH(new Highlighter()));
 	}
 
-	protected abstract Q getSlice(GraphElement selection);
-	
 	@Override
 	protected StyledResult selectionChanged(IAtlasSelectionEvent input, Q filteredSelection) {
 		return null;

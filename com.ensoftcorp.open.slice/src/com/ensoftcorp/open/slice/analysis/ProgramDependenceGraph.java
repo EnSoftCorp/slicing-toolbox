@@ -2,6 +2,7 @@ package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 
@@ -23,15 +24,14 @@ public class ProgramDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(GraphElement selection, SliceDirection direction) {
-		Q statement = Common.toQ(selection);
+	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
 		Q slice = Common.empty();
 		Q pdg = getGraph();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.reverse(statement));
+			slice = slice.union(pdg.reverse(Common.toQ(criteria)));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(pdg.forward(statement));
+			slice = slice.union(pdg.forward(Common.toQ(criteria)));
 		}
 		return slice;
 	}

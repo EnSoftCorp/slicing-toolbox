@@ -169,14 +169,15 @@ public class ControlDependenceGraph extends DependenceGraph {
 	}
 	
 	@Override
-	public Q getSlice(GraphElement controlFlowNode, SliceDirection direction) {
+	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+		Q statements = Common.toQ(criteria);
 		Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
 		Q slice = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(controlDependenceEdges.reverse(Common.toQ(controlFlowNode)));
+			slice = slice.union(controlDependenceEdges.reverse(statements));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(controlDependenceEdges.forward(Common.toQ(controlFlowNode)));
+			slice = slice.union(controlDependenceEdges.forward(statements));
 		}
 		return slice.difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
 	}

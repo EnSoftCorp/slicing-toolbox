@@ -2,6 +2,8 @@ package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
+import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
@@ -41,8 +43,12 @@ public class TaintGraph {
 			ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
 			
 			// taint graph is the forward taint of the source intersected with the reverse taint of the sink
-			Q forwardTaintSlice = pdg.getSlice(source, SliceDirection.FORWARD);
-			Q reverseTaintSlice = pdg.getSlice(sink, SliceDirection.REVERSE);
+			AtlasSet<GraphElement> sources = new AtlasHashSet<GraphElement>();
+			sources.add(source);
+			Q forwardTaintSlice = pdg.getSlice(SliceDirection.FORWARD, sources);
+			AtlasSet<GraphElement> sinks = new AtlasHashSet<GraphElement>();
+			sinks.add(sink);
+			Q reverseTaintSlice = pdg.getSlice(SliceDirection.REVERSE, sinks);
 			taintGraph = forwardTaintSlice.intersection(reverseTaintSlice).eval();
 		}
 	}
