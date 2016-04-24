@@ -36,17 +36,15 @@ The CDG is constructed using the Ferrante, Ottenstein, and Warren (FOW) algorith
 
 	show(cdg.getAugmentedControlFlowGraph())
 
-
 ![Augmented CFG](../images/augmented-cfg.png)
 
  Using the augmented CFG a forward dominance analysis (post-dominance) is performed.
  
-  	show(cdg.getForwardDominanceTree())
-
+	show(cdg.getForwardDominanceTree())
 
 ![Forward Dominance Tree](../images/fdt.png)
 
-  	show(cdg.getGraph())
+	show(cdg.getGraph())
 
 For each edge (X -&gt; Y) in augmented CFG, we find the nodes in the forward dominance tree from Y to the least common ancestor (LCA) of X and Y. We include LCA if LCA is X and exclude LCA if LCA is not X. For the resulting set of nodes, we add a control dependence edge from X to the node.
 
@@ -56,8 +54,7 @@ For each edge (X -&gt; Y) in augmented CFG, we find the nodes in the forward dom
 
 The DDG is computed by adding data dependence edges to statements that contain data flow nodes with a data flow dependence. Atlas provides the [defintion-use chain](https://en.wikipedia.org/wiki/Use-define_chain) by leveraging a [static single assignment form](https://en.wikipedia.org/wiki/Static_single_assignment_form). 
 
-  	show(ddg.getGraph())
-
+	show(ddg.getGraph())
 
 ![Data Dependence Graph](../images/ddg.png)
 
