@@ -3,7 +3,7 @@ layout: default
 ---
 
 ## Overview
-The Slicing Toolbox project provides Atlas native Program Dependence Graph (PDG) based [program slicing](https://en.wikipedia.org/wiki/Program_slicing). The Program Dependence Graph is a combination of analysis on control and data flow graphs that makes the both control and data flow dependencies explicit.
+The Slicing Toolbox project provides Atlas native Program Dependence Graph (PDG) based [program slicing](https://en.wikipedia.org/wiki/Program_slicing). The PDG is a combination of analysis on control and data flow graphs that makes the both control and data flow dependencies explicit.
 
 {: .center}
 ![PDG](./images/pdg.png)
