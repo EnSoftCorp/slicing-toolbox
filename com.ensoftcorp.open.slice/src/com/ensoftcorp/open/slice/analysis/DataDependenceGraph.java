@@ -3,6 +3,7 @@ package com.ensoftcorp.open.slice.analysis;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.log.Log;
@@ -89,14 +90,14 @@ public class DataDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+	public Q getSlice(SliceDirection direction, AtlasSet<Node> newCriteria) {
 		Q dataFlowEdges = Common.toQ(dfg);
 		Q relevantDataFlowNodes = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(newCriteria)));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(newCriteria)));
 		}
 		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
 		Q relevantStatements = containsEdges.predecessors(relevantDataFlowNodes)

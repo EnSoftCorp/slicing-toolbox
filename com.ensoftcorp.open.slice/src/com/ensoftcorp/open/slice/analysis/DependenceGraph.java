@@ -1,6 +1,7 @@
 package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
@@ -19,7 +20,7 @@ public abstract class DependenceGraph {
 	
 	public abstract Q getGraph();
 	
-	public abstract Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria);
+	public abstract Q getSlice(SliceDirection direction, AtlasSet<Node> criteria);
 	
 	public static class Factory {
 		/**

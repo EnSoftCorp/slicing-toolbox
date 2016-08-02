@@ -3,6 +3,7 @@ package com.ensoftcorp.open.slice.analysis;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.log.Log;
@@ -54,7 +55,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		
 		// augment the cfg with a master entry node and a master exit node
 		GraphElement cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
-		AtlasSet<GraphElement> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
+		AtlasSet<Node> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
 		
 		Q augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
 		
@@ -182,7 +183,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 	}
 	
 	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
 		Q statements = Common.toQ(criteria);
 		Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
 		Q slice = Common.empty();

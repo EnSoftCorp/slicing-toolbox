@@ -2,6 +2,7 @@ package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
@@ -35,7 +36,7 @@ public class ProgramDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
 		if(direction == SliceDirection.BI_DIRECTIONAL){
 			return slice(SliceDirection.REVERSE, criteria).union(slice(SliceDirection.FORWARD, criteria));
 		} else {
@@ -49,7 +50,7 @@ public class ProgramDependenceGraph extends DependenceGraph {
 	 * @param criteria
 	 * @return
 	 */
-	private Q slice(SliceDirection direction, AtlasSet<GraphElement> criteria) {
+	private Q slice(SliceDirection direction, AtlasSet<Node> criteria) {
 		if(direction == SliceDirection.BI_DIRECTIONAL){
 			throw new RuntimeException("Bi-directional slicing must be done stepwise...");
 		}
@@ -63,8 +64,8 @@ public class ProgramDependenceGraph extends DependenceGraph {
 		long numSliceEdges = slice.eval().edges().size();
 		boolean fixedPoint = false;
 		while(!fixedPoint){
-			AtlasSet<GraphElement> newCriteriaStatements = slice.nodesTaggedWithAny(XCSG.ControlFlow_Node).difference(oldCriteria).eval().nodes();
-			AtlasSet<GraphElement> newCriteria = Common.toQ(newCriteriaStatements).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).difference(oldCriteria).eval().nodes();
+			AtlasSet<Node> newCriteriaStatements = slice.nodesTaggedWithAny(XCSG.ControlFlow_Node).difference(oldCriteria).eval().nodes();
+			AtlasSet<Node> newCriteria = Common.toQ(newCriteriaStatements).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).difference(oldCriteria).eval().nodes();
 			slice = slice.union(ddg.getSlice(direction, newCriteria).union(cdg.getSlice(direction, newCriteriaStatements)));
 			oldCriteria = Common.toQ(newCriteria).union(Common.toQ(newCriteriaStatements));
 			

@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
@@ -16,7 +17,7 @@ import com.ensoftcorp.open.slice.analysis.DataDependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 import com.ensoftcorp.open.slice.analysis.ProgramDependenceGraph;
-import com.ensoftcorp.open.toolbox.commons.SetDefinitions;
+import com.ensoftcorp.open.commons.analysis.SetDefinitions;
 
 public class Benchmarks {
 
@@ -30,10 +31,10 @@ public class Benchmarks {
 					+ "Average Forward Slice Time (ms),Average Forward Slice Nodes,Average Forward Slice Edges,"
 					+ "Average Bi-Directional Slice Time (ms),Average Bi-Directional Slice Nodes,Average Bi-Directional Slice Edges\n");
 		
-		AtlasSet<GraphElement> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
-		AtlasSet<GraphElement> methodsToIterate = new AtlasHashSet<GraphElement>();
+		AtlasSet<Node> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
+		AtlasSet<Node> methodsToIterate = new AtlasHashSet<Node>();
 		methodsToIterate.addAll(methods);
-		for(GraphElement method : methodsToIterate){
+		for(Node method : methodsToIterate){
 			output.write(getQualifiedElementName(method));
 			
 			long start = System.nanoTime();
@@ -50,7 +51,7 @@ public class Benchmarks {
 			long reverseSliceNodes = 0;
 			long reverseSliceEdges = 0;
 			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = cdg.getSlice(SliceDirection.REVERSE, criteria).eval();
@@ -69,8 +70,8 @@ public class Benchmarks {
 			double forwardSliceTime = 0;
 			long forwardSliceNodes = 0;
 			long forwardSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = cdg.getSlice(SliceDirection.FORWARD, criteria).eval();
@@ -89,8 +90,8 @@ public class Benchmarks {
 			double bidirectionalSliceTime = 0;
 			long bidirectionalSliceNodes = 0;
 			long bidirectionalSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = cdg.getSlice(SliceDirection.BI_DIRECTIONAL, criteria).eval();
@@ -121,10 +122,10 @@ public class Benchmarks {
 					+ "Average Forward Slice Time (ms),Average Forward Slice Nodes,Average Forward Slice Edges,"
 					+ "Average Bi-Directional Slice Time (ms),Average Bi-Directional Slice Nodes,Average Bi-Directional Slice Edges\n");
 		
-		AtlasSet<GraphElement> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
-		AtlasSet<GraphElement> methodsToIterate = new AtlasHashSet<GraphElement>();
+		AtlasSet<Node> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
+		AtlasSet<Node> methodsToIterate = new AtlasHashSet<Node>();
 		methodsToIterate.addAll(methods);
-		for(GraphElement method : methodsToIterate){
+		for(Node method : methodsToIterate){
 			output.write(getQualifiedElementName(method));
 			
 			long start = System.nanoTime();
@@ -140,8 +141,8 @@ public class Benchmarks {
 			double reverseSliceTime = 0;
 			long reverseSliceNodes = 0;
 			long reverseSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = ddg.getSlice(SliceDirection.REVERSE, criteria).eval();
@@ -160,8 +161,8 @@ public class Benchmarks {
 			double forwardSliceTime = 0;
 			long forwardSliceNodes = 0;
 			long forwardSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = ddg.getSlice(SliceDirection.FORWARD, criteria).eval();
@@ -180,8 +181,8 @@ public class Benchmarks {
 			double bidirectionalSliceTime = 0;
 			long bidirectionalSliceNodes = 0;
 			long bidirectionalSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = ddg.getSlice(SliceDirection.BI_DIRECTIONAL, criteria).eval();
@@ -212,10 +213,10 @@ public class Benchmarks {
 					+ "Average Forward Slice Time (ms),Average Forward Slice Nodes,Average Forward Slice Edges,"
 					+ "Average Bi-Directional Slice Time (ms),Average Bi-Directional Slice Nodes,Average Bi-Directional Slice Edges\n");
 		
-		AtlasSet<GraphElement> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
-		AtlasSet<GraphElement> methodsToIterate = new AtlasHashSet<GraphElement>();
+		AtlasSet<Node> methods = SetDefinitions.app().nodesTaggedWithAny(XCSG.Method).eval().nodes();
+		AtlasSet<Node> methodsToIterate = new AtlasHashSet<Node>();
 		methodsToIterate.addAll(methods);
-		for(GraphElement method : methodsToIterate){
+		for(Node method : methodsToIterate){
 			output.write(getQualifiedElementName(method));
 			
 			long start = System.nanoTime();
@@ -231,8 +232,8 @@ public class Benchmarks {
 			double reverseSliceTime = 0;
 			long reverseSliceNodes = 0;
 			long reverseSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = pdg.getSlice(SliceDirection.REVERSE, criteria).eval();
@@ -251,8 +252,8 @@ public class Benchmarks {
 			double forwardSliceTime = 0;
 			long forwardSliceNodes = 0;
 			long forwardSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = pdg.getSlice(SliceDirection.FORWARD, criteria).eval();
@@ -271,8 +272,8 @@ public class Benchmarks {
 			double bidirectionalSliceTime = 0;
 			long bidirectionalSliceNodes = 0;
 			long bidirectionalSliceEdges = 0;
-			for(GraphElement sliceCriterion : graph.nodes()){
-				AtlasSet<GraphElement> criteria = new AtlasHashSet<GraphElement>();
+			for(Node sliceCriterion : graph.nodes()){
+				AtlasSet<Node> criteria = new AtlasHashSet<Node>();
 				criteria.add(sliceCriterion);
 				long startSlice = System.nanoTime();
 				Graph slice = pdg.getSlice(SliceDirection.BI_DIRECTIONAL, criteria).eval();
@@ -293,11 +294,11 @@ public class Benchmarks {
 		output.close();
 	}
 	
-	private static String getQualifiedElementName(GraphElement graphElement) {
+	private static String getQualifiedElementName(Node graphElement) {
 		String name = graphElement.getAttr(XCSG.name).toString();
 		// qualify the element with structural information
 		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
-		GraphElement parent = containsEdges.predecessors(Common.toQ(graphElement)).eval().nodes().getFirst();
+		Node parent = containsEdges.predecessors(Common.toQ(graphElement)).eval().nodes().getFirst();
 		while (parent != null) {
 			// skip adding qualified part for default package
 			if (!(parent.tags().contains(XCSG.Package) && parent.getAttr(XCSG.name).toString().equals(""))) {

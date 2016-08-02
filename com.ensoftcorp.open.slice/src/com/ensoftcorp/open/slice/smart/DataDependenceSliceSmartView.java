@@ -1,6 +1,6 @@
 package com.ensoftcorp.open.slice.smart;
 
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
@@ -15,7 +15,7 @@ import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
 import com.ensoftcorp.open.slice.analysis.DataDependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
-import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.utils.StandardQueries;
 
 public class DataDependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
@@ -52,11 +52,11 @@ public class DataDependenceSliceSmartView extends FilteringAtlasSmartViewScript 
 			return null;
 		}
 		
-		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
+		AtlasSet<Node> criteria = filteredSelection.eval().nodes();
 		Q completeResult = Common.empty();
-		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
+		for(Node method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
 			DataDependenceGraph ddg = DependenceGraph.Factory.buildDDG(method);
-			AtlasSet<GraphElement> relevantCriteria = ddg.getGraph().intersection(Common.toQ(criteria)).eval().nodes();
+			AtlasSet<Node> relevantCriteria = ddg.getGraph().intersection(Common.toQ(criteria)).eval().nodes();
 			completeResult = completeResult.union(ddg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria));
 		}
 		

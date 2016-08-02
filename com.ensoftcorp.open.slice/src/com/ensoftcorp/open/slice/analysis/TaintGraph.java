@@ -4,13 +4,14 @@ import java.awt.Color;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
-import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.utils.StandardQueries;
 
 /**
  * A program dependence graph based taint graph (also known as chopping)
@@ -19,12 +20,12 @@ import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
  */
 public class TaintGraph {
 
-	private GraphElement source;
-	private GraphElement sink;
+	private Node source;
+	private Node sink;
 	
 	private Graph taintGraph = Common.empty().eval();
 	
-	public TaintGraph(GraphElement source, GraphElement sink){
+	public TaintGraph(Node source, Node sink){
 		this.source = source;
 		this.sink = sink;
 		
@@ -39,10 +40,10 @@ public class TaintGraph {
 			ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
 			
 			// taint graph is the forward taint of the source intersected with the reverse taint of the sink
-			AtlasSet<GraphElement> sources = new AtlasHashSet<GraphElement>();
+			AtlasSet<Node> sources = new AtlasHashSet<Node>();
 			sources.add(source);
 			Q forwardTaintSlice = pdg.getSlice(SliceDirection.FORWARD, sources);
-			AtlasSet<GraphElement> sinks = new AtlasHashSet<GraphElement>();
+			AtlasSet<Node> sinks = new AtlasHashSet<Node>();
 			sinks.add(sink);
 			Q reverseTaintSlice = pdg.getSlice(SliceDirection.REVERSE, sinks);
 			taintGraph = forwardTaintSlice.intersection(reverseTaintSlice).union(Common.toQ(source), Common.toQ(sink)).eval();

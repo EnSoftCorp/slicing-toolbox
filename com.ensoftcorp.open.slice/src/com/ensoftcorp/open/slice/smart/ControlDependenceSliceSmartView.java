@@ -3,6 +3,7 @@ package com.ensoftcorp.open.slice.smart;
 import java.awt.Color;
 
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
@@ -18,7 +19,7 @@ import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
 import com.ensoftcorp.open.slice.analysis.ControlDependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
-import com.ensoftcorp.open.toolbox.commons.analysis.utils.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.utils.StandardQueries;
 
 public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
@@ -55,9 +56,9 @@ public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 			return null;
 		}
 		
-		AtlasSet<GraphElement> criteria = filteredSelection.eval().nodes();
-		AtlasSet<GraphElement> statements = new AtlasHashSet<GraphElement>();
-		for(GraphElement criterion : criteria){
+		AtlasSet<Node> criteria = filteredSelection.eval().nodes();
+		AtlasSet<Node> statements = new AtlasHashSet<Node>();
+		for(Node criterion : criteria){
 			if(criterion.taggedWith(XCSG.DataFlow_Node)){
 				statements.add(Common.toQ(criterion).parent().eval().nodes().getFirst());
 			} else {
