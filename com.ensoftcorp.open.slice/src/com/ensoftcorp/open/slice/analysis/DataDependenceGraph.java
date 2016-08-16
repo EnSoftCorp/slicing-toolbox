@@ -90,14 +90,14 @@ public class DataDependenceGraph extends DependenceGraph {
 	}
 
 	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<Node> newCriteria) {
+	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
 		Q dataFlowEdges = Common.toQ(dfg);
 		Q relevantDataFlowNodes = Common.empty();
 		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(newCriteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
 		} 
 		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(newCriteria)));
+			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
 		}
 		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
 		Q relevantStatements = containsEdges.predecessors(relevantDataFlowNodes)
