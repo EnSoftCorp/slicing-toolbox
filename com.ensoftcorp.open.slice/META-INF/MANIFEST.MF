@@ -8,7 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: 
  org.eclipse.debug.ui,
  com.ensoftcorp.atlas.ui,
- com.ensoftcorp.open.commons;bundle-version="3.0.8"
+ com.ensoftcorp.open.commons;bundle-version="3.0.10"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
