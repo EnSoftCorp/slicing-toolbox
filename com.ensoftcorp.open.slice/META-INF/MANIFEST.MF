@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Slicing Toolbox
 Bundle-SymbolicName: com.ensoftcorp.open.slice;singleton:=true
-Bundle-Version: 2.7.3.qualifier
+Bundle-Version: 3.0.10.qualifier
 Bundle-Vendor: EnSoft Corp.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: 
@@ -12,5 +12,4 @@ Require-Bundle:
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
-Export-Package: com.ensoftcorp.open.slice,
- com.ensoftcorp.open.slice.analysis
+Export-Package: com.ensoftcorp.open.slice.analysis

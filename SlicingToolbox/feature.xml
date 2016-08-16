@@ -2,7 +2,7 @@
 <feature
       id="SlicingToolbox"
       label="Slicing Toolbox"
-      version="2.7.3.qualifier"
+      version="3.0.10.qualifier"
       provider-name="Ensoft Corp.">
 
    <description url="https://ensoftcorp.github.io/slicing-toolbox">
@@ -39,7 +39,7 @@ SOFTWARE.
 
    <url>
       <update label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
-      <discovery label="Atlas" url="http://newsite"/>
+      <discovery label="Atlas" url="http://download.ensoftcorp.com/atlas/eclipse"/>
       <discovery label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/toolbox-commons/updates/"/>
       <discovery label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
    </url>
