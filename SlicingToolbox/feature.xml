@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="SlicingToolbox"
+      id="com.ensoftcorp.open.slice"
       label="Slicing Toolbox"
       version="3.0.10.qualifier"
       provider-name="Ensoft Corp.">
@@ -38,10 +38,23 @@ SOFTWARE.
    </license>
 
    <url>
-      <update label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
+      <update label="Slicing Toolbox" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
       <discovery label="Atlas" url="http://download.ensoftcorp.com/atlas/eclipse"/>
-      <discovery label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/toolbox-commons/updates/"/>
-      <discovery label="ensoftcorp.github.io" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
+      <discovery label="Toolbox Commons" url="https://ensoftcorp.github.io/toolbox-commons/updates/"/>
+      <discovery label="Slicing Toolbox" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
    </url>
+
+   <requires>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="com.ensoftcorp.atlas.ui"/>
+      <import plugin="com.ensoftcorp.open.commons" version="3.0.10" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="com.ensoftcorp.open.slice"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
