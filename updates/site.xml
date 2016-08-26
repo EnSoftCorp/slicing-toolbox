@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/SlicingToolbox_2.7.3.201604240030.jar" id="SlicingToolbox" version="2.7.3.201604240030">
-      <category name="Slicing Toolbox"/>
-   </feature>
-   <feature url="features/com.ensoftcorp.open.slice_3.0.10.201608261406.jar" id="com.ensoftcorp.open.slice" version="3.0.10.201608261406">
+   <feature url="features/com.ensoftcorp.open.slice_3.0.10.201608261417.jar" id="com.ensoftcorp.open.slice" version="3.0.10.201608261417">
       <category name="Slicing Toolbox"/>
    </feature>
    <category-def name="Slicing Toolbox" label="Slicing Toolbox">
