@@ -27,5 +27,8 @@ If you want to install from source for bleeding edge changes, first grab a copy 
 ## Changelog
 Note that version numbers are based off [Atlas](http://www.ensoftcorp.com/atlas/download/) version numbers.
 
+### 3.0.10
+Atlas 3.0.x compatibility updates
+
 ### 2.7.3
 - Initial Release
