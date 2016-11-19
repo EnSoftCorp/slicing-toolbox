@@ -13,10 +13,10 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
+import com.ensoftcorp.open.commons.analysis.StandardQueries;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 import com.ensoftcorp.open.slice.analysis.ProgramDependenceGraph;
-import com.ensoftcorp.open.commons.analysis.utils.StandardQueries;
 
 public class ProgramDependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
 
@@ -55,7 +55,7 @@ public class ProgramDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 		
 		AtlasSet<Node> criteria = filteredSelection.eval().nodes();
 		Q completeResult = Common.empty();
-		for(GraphElement method : StandardQueries.getContainingMethods(Common.toQ(criteria)).eval().nodes()){
+		for(GraphElement method : StandardQueries.getContainingFunction(Common.toQ(criteria)).eval().nodes()){
 			ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
 			AtlasSet<Node> relevantCriteria = pdg.getGraph().intersection(Common.toQ(criteria)).eval().nodes();
 			completeResult = completeResult.union(pdg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria));
