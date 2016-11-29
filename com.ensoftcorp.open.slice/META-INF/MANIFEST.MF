@@ -4,7 +4,7 @@ Bundle-Name: Slicing Toolbox
 Bundle-SymbolicName: com.ensoftcorp.open.slice;singleton:=true
 Bundle-Version: 3.0.12.qualifier
 Bundle-Vendor: EnSoft Corp.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: 
  org.eclipse.debug.ui,
  com.ensoftcorp.atlas.ui,
