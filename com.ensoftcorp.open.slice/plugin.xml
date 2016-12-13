@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <!-- add the slicing smart views -->
    <extension
          point="com.ensoftcorp.atlas.ui.smartViewScript">
       <script
