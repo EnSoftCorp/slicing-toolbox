@@ -55,7 +55,7 @@ public class ProgramDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 		
 		AtlasSet<Node> criteria = filteredSelection.eval().nodes();
 		Q completeResult = Common.empty();
-		for(GraphElement method : StandardQueries.getContainingFunction(Common.toQ(criteria)).eval().nodes()){
+		for(GraphElement method : StandardQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes()){
 			ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
 			AtlasSet<Node> relevantCriteria = pdg.getGraph().intersection(Common.toQ(criteria)).eval().nodes();
 			completeResult = completeResult.union(pdg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria));

@@ -68,7 +68,7 @@ public class ControlDependenceSliceSmartView extends FilteringAtlasSmartViewScri
 		criteria = statements;
 		
 		Q completeResult = Common.empty();
-		for(GraphElement method : StandardQueries.getContainingFunction(Common.toQ(criteria)).eval().nodes()){
+		for(GraphElement method : StandardQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes()){
 			Q relevantCriteria = Common.toQ(method).contained().intersection(Common.toQ(criteria));
 			ControlDependenceGraph cdg = DependenceGraph.Factory.buildCDG(method);
 			completeResult = Common.toQ(completeResult.union(cdg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());
