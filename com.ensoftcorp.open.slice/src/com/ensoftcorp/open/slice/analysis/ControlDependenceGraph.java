@@ -10,6 +10,7 @@ import com.ensoftcorp.atlas.core.log.Log;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
+import com.ensoftcorp.open.commons.analysis.StandardQueries;
 
 /**
  * 
@@ -128,7 +129,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			GraphElement y = cfEdge.getNode(EdgeDirection.TO);
 			
 			// least common ancestor in forward dominance tree
-			GraphElement lca = leastCommonAncestor(x, y, fdt);
+			GraphElement lca = StandardQueries.leastCommonAncestor(x, y, fdt);
 			
 			// sanity check
 			if(lca == null){
@@ -158,12 +159,6 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		this.cdg = Common.toQ(controlDependenceEdgeSet).eval();
-	}
-	
-	private GraphElement leastCommonAncestor(GraphElement child1, GraphElement child2, Graph graph){
-		Q g = Common.toQ(graph);
-		Q ancestors = g.reverse(Common.toQ(child1)).intersection(g.reverse(Common.toQ(child2)));
-		return ancestors.leaves().eval().nodes().getFirst();
 	}
 	
 	public Q getControlFlowGraph(){
