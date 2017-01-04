@@ -37,11 +37,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
    </license>
 
-   <url>
-      <update label="Slicing Toolbox" url="https://ensoftcorp.github.io/slicing-toolbox/updates/"/>
-      <discovery label="Atlas" url="http://download.ensoftcorp.com/atlas/eclipse"/>
-   </url>
-
    <requires>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="com.ensoftcorp.atlas.ui"/>
