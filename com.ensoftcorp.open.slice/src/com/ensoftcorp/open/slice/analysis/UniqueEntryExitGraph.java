@@ -1,6 +1,8 @@
 package com.ensoftcorp.open.slice.analysis;
 
+import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 
 public interface UniqueEntryExitGraph {
@@ -8,24 +10,24 @@ public interface UniqueEntryExitGraph {
 	/**
 	 * Returns the predecessors of a given node
 	 */
-	public AtlasSet<GraphElement> getPredecessors(GraphElement node);
+	public AtlasSet<Node> getPredecessors(Node node);
 
 	/**
 	 * Returns the successors of a given node
 	 */
-	public AtlasSet<GraphElement> getSuccessors(GraphElement node);
+	public AtlasSet<Node> getSuccessors(Node node);
 
 	/**
 	 * Returns the master entry node
 	 */
-	public GraphElement getEntryNode();
+	public Node getEntryNode();
 
 	/**
 	 * Returns the master exit node
 	 */
-	public GraphElement getExitNode();
+	public Node getExitNode();
 
-	public AtlasSet<GraphElement> nodes();
+	public AtlasSet<Node> nodes();
 
-	public AtlasSet<GraphElement> edges();
+	public AtlasSet<Edge> edges();
 }

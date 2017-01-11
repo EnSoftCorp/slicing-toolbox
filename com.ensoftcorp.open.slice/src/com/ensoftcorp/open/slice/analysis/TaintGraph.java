@@ -3,7 +3,6 @@ package com.ensoftcorp.open.slice.analysis;
 import java.awt.Color;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
@@ -29,12 +28,12 @@ public class TaintGraph {
 		this.source = source;
 		this.sink = sink;
 		
-		GraphElement sourceMethod = StandardQueries.getContainingFunction(source);
-		GraphElement sinkMethod = StandardQueries.getContainingFunction(sink);
+		Node sourceMethod = StandardQueries.getContainingFunction(source);
+		Node sinkMethod = StandardQueries.getContainingFunction(sink);
 		
 		// only considering intra-procedural case
 		if(sourceMethod.equals(sinkMethod)){
-			GraphElement method = sourceMethod;
+			Node method = sourceMethod;
 			
 			// build program dependence graph
 			ProgramDependenceGraph pdg = DependenceGraph.Factory.buildPDG(method);
@@ -50,11 +49,11 @@ public class TaintGraph {
 		}
 	}
 
-	public GraphElement getSource() {
+	public Node getSource() {
 		return source;
 	}
 
-	public GraphElement getSink() {
+	public Node getSink() {
 		return sink;
 	}
 	

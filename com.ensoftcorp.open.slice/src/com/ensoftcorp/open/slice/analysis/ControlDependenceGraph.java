@@ -1,7 +1,7 @@
 package com.ensoftcorp.open.slice.analysis;
 
+import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
@@ -30,9 +30,9 @@ public class ControlDependenceGraph extends DependenceGraph {
 	 */
 	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
 	
-	private GraphElement master;
-	private GraphElement entry;
-	private GraphElement exit;
+	private Node master;
+	private Node entry;
+	private Node exit;
 	
 	private static final String CFG_ENTRY = "cfg-entry";
 	private static final String CFG_EXIT = "cfg-exit";
@@ -55,7 +55,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		// augment the cfg with a master entry node and a master exit node
-		GraphElement cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
+		Node cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
 		AtlasSet<Node> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
 		
 		Q augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
@@ -68,7 +68,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			entry.tag(CFG_ENTRY);
 			entry.putAttr(XCSG.name, "entry");
 			
-			GraphElement augmentationEdge = Graph.U.createEdge(entry, cfRoot);
+			Edge augmentationEdge = Graph.U.createEdge(entry, cfRoot);
 			augmentationEdge.tag(AUGMENTATION_EDGE);
 			augmentationEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
 			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
@@ -83,9 +83,9 @@ public class ControlDependenceGraph extends DependenceGraph {
 			exit.putAttr(XCSG.name, "exit");
 			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
 		}
-		for(GraphElement cfExit : cfExits){
+		for(Node cfExit : cfExits){
 			if(augmentationEdges.successors(Common.toQ(cfExit)).eval().nodes().isEmpty()){
-				GraphElement augmentationEdge = Graph.U.createEdge(cfExit, exit);
+				Edge augmentationEdge = Graph.U.createEdge(cfExit, exit);
 				augmentationEdge.tag(AUGMENTATION_EDGE);
 				augmentationEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
 				augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
@@ -99,11 +99,11 @@ public class ControlDependenceGraph extends DependenceGraph {
 			master.tag(AUGMENTATION_NODE);
 			master.putAttr(XCSG.name, AUGMENTATION_NAME);
 			
-			GraphElement augmentationEntryEdge = Graph.U.createEdge(master, entry);
+			Edge augmentationEntryEdge = Graph.U.createEdge(master, entry);
 			augmentationEntryEdge.tag(AUGMENTATION_EDGE);
 			augmentationEntryEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
 			
-			GraphElement augmentationExitEdge = Graph.U.createEdge(master, exit);
+			Edge augmentationExitEdge = Graph.U.createEdge(master, exit);
 			augmentationExitEdge.tag(AUGMENTATION_EDGE);
 			augmentationExitEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
 			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
@@ -123,13 +123,13 @@ public class ControlDependenceGraph extends DependenceGraph {
 		// find nodes in the forward dominance tree from Y
 		// to the least common ancestor (LCA) of X and Y 
 		// (including LCA if LCA is X and excluding LCA if LCA is not X)
-		AtlasSet<GraphElement> controlDependenceEdgeSet = new AtlasHashSet<GraphElement>();
-		for(GraphElement cfEdge : augmentedCFG.edges()){
-			GraphElement x = cfEdge.getNode(EdgeDirection.FROM);
-			GraphElement y = cfEdge.getNode(EdgeDirection.TO);
+		AtlasSet<Edge> controlDependenceEdgeSet = new AtlasHashSet<Edge>();
+		for(Edge cfEdge : augmentedCFG.edges()){
+			Node x = cfEdge.getNode(EdgeDirection.FROM);
+			Node y = cfEdge.getNode(EdgeDirection.TO);
 			
 			// least common ancestor in forward dominance tree
-			GraphElement lca = StandardQueries.leastCommonAncestor(x, y, fdt);
+			Node lca = StandardQueries.leastCommonAncestor(x, y, fdt);
 			
 			// sanity check
 			if(lca == null){
@@ -138,7 +138,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			}
 			
 			// nodes between lca -> Y (nodes dependent on X)
-			AtlasSet<GraphElement> nodesControlDependentOnX = new AtlasHashSet<GraphElement>();
+			AtlasSet<Node> nodesControlDependentOnX = new AtlasHashSet<Node>();
 			nodesControlDependentOnX.addAll(Common.toQ(fdt).between(Common.toQ(lca), Common.toQ(y)).eval().nodes());
 			// remove LCA if LCA is not X
 			if(!lca.equals(x)){
@@ -146,9 +146,9 @@ public class ControlDependenceGraph extends DependenceGraph {
 			}
 			
 			// add control dependence edges
-			for(GraphElement node : nodesControlDependentOnX){
+			for(Node node : nodesControlDependentOnX){
 				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
-				GraphElement controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().getFirst();
+				Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().getFirst();
 				if(controlDependenceEdge == null){
 					controlDependenceEdge = Graph.U.createEdge(x, node);
 					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
@@ -175,20 +175,6 @@ public class ControlDependenceGraph extends DependenceGraph {
 	
 	public Q getGraph(){
 		return Common.toQ(cdg).difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
-	}
-	
-	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
-		Q statements = Common.toQ(criteria);
-		Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
-		Q slice = Common.empty();
-		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(controlDependenceEdges.reverse(statements));
-		} 
-		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			slice = slice.union(controlDependenceEdges.forward(statements));
-		}
-		return slice.difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
 	}
 	
 }

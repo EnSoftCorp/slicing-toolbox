@@ -3,9 +3,10 @@ package com.ensoftcorp.open.slice.analysis;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
@@ -23,12 +24,12 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	/**
 	 * The set of nodes in the current graph
 	 */
-	private AtlasSet<GraphElement> nodes;
+	private AtlasSet<Node> nodes;
 	
 	/**
 	 * The set of edges in the current graph
 	 */
-	private AtlasSet<GraphElement> edges;
+	private AtlasSet<Edge> edges;
 
 	private String[] entryNodeTags = { XCSG.controlFlowRoot };
 
@@ -38,16 +39,16 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	 * @param cfg a ControlFlowGraph (may include ExceptionalControlFlow_Edges)
 	 */
 	public ForwardDominanceTree(Graph cfg) {
-		this.nodes = new AtlasHashSet<GraphElement>();
+		this.nodes = new AtlasHashSet<Node>();
 		this.nodes().addAll(cfg.nodes());
-		this.edges = new AtlasHashSet<GraphElement>();
+		this.edges = new AtlasHashSet<Edge>();
 		this.edges().addAll(cfg.edges());
 	}
 	
 	public ForwardDominanceTree(Graph cfg, String[] entryNodeTags, String[] exitNodeTags) {
-		this.nodes = new AtlasHashSet<GraphElement>();
+		this.nodes = new AtlasHashSet<Node>();
 		this.nodes().addAll(cfg.nodes());
-		this.edges = new AtlasHashSet<GraphElement>();
+		this.edges = new AtlasHashSet<Edge>();
 		this.edges().addAll(cfg.edges());
 		
 		this.entryNodeTags = entryNodeTags;
@@ -56,13 +57,13 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	
 	public Graph getForwardDominanceTree(){
 		DominanceAnalysis dominanceAnalysis = new DominanceAnalysis(this, true);
-		Multimap<GraphElement> dominanceFrontier = dominanceAnalysis.getDominatorTree();
-		AtlasSet<GraphElement> dominanceTree = new AtlasHashSet<GraphElement>();
-		for(Entry<GraphElement, Set<GraphElement>> entry : dominanceFrontier.entrySet()){
-			GraphElement fromNode = entry.getKey();
-			for(GraphElement toNode : entry.getValue()){
+		Multimap<Node> dominanceFrontier = dominanceAnalysis.getDominatorTree();
+		AtlasSet<Node> dominanceTree = new AtlasHashSet<Node>();
+		for(Entry<Node, Set<Node>> entry : dominanceFrontier.entrySet()){
+			Node fromNode = entry.getKey();
+			for(Node toNode : entry.getValue()){
 				Q forwardDominanceEdges = Common.universe().edgesTaggedWithAny(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
-				GraphElement forwardDominanceEdge = forwardDominanceEdges.betweenStep(Common.toQ(fromNode), Common.toQ(toNode)).eval().edges().getFirst();
+				Edge forwardDominanceEdge = forwardDominanceEdges.betweenStep(Common.toQ(fromNode), Common.toQ(toNode)).eval().edges().getFirst();
 				if(forwardDominanceEdge == null){
 					forwardDominanceEdge = Graph.U.createEdge(fromNode, toNode);
 					forwardDominanceEdge.tag(IMMEDIATE_FORWARD_DOMINANCE_EDGE);
@@ -80,11 +81,11 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	 * @return Predecessors of node
 	 */
 	@Override
-	public AtlasSet<GraphElement> getPredecessors(GraphElement node){
-		AtlasSet<GraphElement> predecessors = new AtlasHashSet<GraphElement>();
-		for(GraphElement edge : this.edges()){
+	public AtlasSet<Node> getPredecessors(Node node){
+		AtlasSet<Node> predecessors = new AtlasHashSet<Node>();
+		for(Edge edge : this.edges()){
 			if(edge.getNode(EdgeDirection.TO).equals(node)){
-				GraphElement parent = edge.getNode(EdgeDirection.FROM);
+				Node parent = edge.getNode(EdgeDirection.FROM);
 				predecessors.add(parent);
 			}
 		}
@@ -97,11 +98,11 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	 * @return Successors of node
 	 */
 	@Override
-	public AtlasSet<GraphElement> getSuccessors(GraphElement node){		
-		AtlasSet<GraphElement> successors = new AtlasHashSet<GraphElement>();
-		for(GraphElement edge : this.edges()){
+	public AtlasSet<Node> getSuccessors(Node node){		
+		AtlasSet<Node> successors = new AtlasHashSet<Node>();
+		for(Edge edge : this.edges()){
 			if(edge.getNode(EdgeDirection.FROM).equals(node)){
-				GraphElement child = edge.getNode(EdgeDirection.TO);
+				Node child = edge.getNode(EdgeDirection.TO);
 				successors.add(child);
 			}
 		}
@@ -109,22 +110,22 @@ public class ForwardDominanceTree implements UniqueEntryExitGraph {
 	}
 
 	@Override
-	public GraphElement getEntryNode() {
+	public Node getEntryNode() {
 		return this.nodes().taggedWithAny(entryNodeTags).getFirst();
 	}
 
 	@Override
-	public GraphElement getExitNode() {
+	public Node getExitNode() {
 		return this.nodes().taggedWithAll(exitNodeTags).getFirst();
 	}
 
 	@Override
-	public AtlasSet<GraphElement> nodes() {
+	public AtlasSet<Node> nodes() {
 		return nodes;
 	}
 
 	@Override
-	public AtlasSet<GraphElement> edges() {
+	public AtlasSet<Edge> edges() {
 		return edges;
 	}
 

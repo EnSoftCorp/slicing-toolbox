@@ -1,11 +1,12 @@
 package com.ensoftcorp.open.slice.analysis;
 
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
+import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
+import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 
 public abstract class DependenceGraph {
 
@@ -20,7 +21,47 @@ public abstract class DependenceGraph {
 	
 	public abstract Q getGraph();
 	
-	public abstract Q getSlice(SliceDirection direction, AtlasSet<Node> criteria);
+	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
+		Q dependenceGraph = getGraph();
+		Q slice = Common.empty();
+		
+		Q statements = Common.toQ(getStatements(criteria));
+		
+		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
+			slice = slice.union(dependenceGraph.reverse(statements));
+		} 
+		
+		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
+			slice = slice.union(dependenceGraph.forward(statements));
+		}
+		
+		return slice;
+	}
+	
+	/**
+	 * Returns the control flow nodes given a mixed set of control and data flow nodes
+	 * If a node is a data flow node, its parent control flow node is returned
+	 * @param criteria
+	 * @return
+	 */
+	public static AtlasSet<Node> getStatements(AtlasSet<Node> criteria){
+		AtlasSet<Node> statements = new AtlasHashSet<Node>();
+		for(Node criterion : criteria){
+			if(criterion.taggedWith(XCSG.DataFlow_Node)){
+				statements.add(DataDependenceGraph.getStatement(criterion));
+			} else if(criterion.taggedWith(XCSG.ControlFlow_Node)){
+				statements.add(criterion);
+			}
+		}
+		return statements;
+	}
+	
+	/**
+	 * Returns the control flow node for the corresponding data flow node
+	 */
+	public static Node getStatement(Node dataFlowNode){
+		return Common.toQ(dataFlowNode).parent().eval().nodes().one();
+	}
 	
 	public static class Factory {
 		/**
@@ -28,7 +69,7 @@ public abstract class DependenceGraph {
 		 * @param method
 		 * @return
 		 */
-		public static ControlDependenceGraph buildCDG(GraphElement method){
+		public static ControlDependenceGraph buildCDG(Node method){
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
@@ -40,7 +81,7 @@ public abstract class DependenceGraph {
 		 * @param method
 		 * @return
 		 */
-		public static DataDependenceGraph buildDDG(GraphElement method){
+		public static DataDependenceGraph buildDDG(Node method){
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
 			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
 			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
@@ -55,7 +96,7 @@ public abstract class DependenceGraph {
 		 * @param method
 		 * @return
 		 */
-		public static ProgramDependenceGraph buildPDG(GraphElement method){
+		public static ProgramDependenceGraph buildPDG(Node method){
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 			

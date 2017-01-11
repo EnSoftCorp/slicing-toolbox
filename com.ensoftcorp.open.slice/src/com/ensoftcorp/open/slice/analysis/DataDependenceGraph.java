@@ -1,7 +1,7 @@
 package com.ensoftcorp.open.slice.analysis;
 
+import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
@@ -31,17 +31,17 @@ public class DataDependenceGraph extends DependenceGraph {
 		
 		this.dfg = dfg;
 		
-		AtlasSet<GraphElement> dataDependenceEdgeSet = new AtlasHashSet<GraphElement>();
-		for(GraphElement dfEdge : dfg.edges()){
+		AtlasSet<Edge> dataDependenceEdgeSet = new AtlasHashSet<Edge>();
+		for(Edge dfEdge : dfg.edges()){
 			
-			GraphElement from = dfEdge.getNode(EdgeDirection.FROM);
-			GraphElement fromStatement = from;
+			Node from = dfEdge.getNode(EdgeDirection.FROM);
+			Node fromStatement = from;
 			if(!fromStatement.taggedWith(XCSG.Parameter)){
 				fromStatement = getStatement(from);
 			}
 			
-			GraphElement to = dfEdge.getNode(EdgeDirection.TO);
-			GraphElement toStatement = to;
+			Node to = dfEdge.getNode(EdgeDirection.TO);
+			Node toStatement = to;
 			if(!toStatement.taggedWith(XCSG.ReturnValue)){
 				toStatement = getStatement(to);
 			}
@@ -65,7 +65,7 @@ public class DataDependenceGraph extends DependenceGraph {
 			}
 			
 			Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
-			GraphElement dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
+			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 			if(dataDependenceEdge == null){
 				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
@@ -87,31 +87,6 @@ public class DataDependenceGraph extends DependenceGraph {
 	 */
 	public Q getDataFlowGraph(){
 		return Common.toQ(dfg);
-	}
-
-	@Override
-	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
-		Q dataFlowEdges = Common.toQ(dfg);
-		Q relevantDataFlowNodes = Common.empty();
-		if(direction == SliceDirection.REVERSE || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.reverse(Common.toQ(criteria)));
-		} 
-		if(direction == SliceDirection.FORWARD || direction == SliceDirection.BI_DIRECTIONAL){
-			relevantDataFlowNodes = relevantDataFlowNodes.union(dataFlowEdges.forward(Common.toQ(criteria)));
-		}
-		Q containsEdges = Common.universe().edgesTaggedWithAny(XCSG.Contains);
-		Q relevantStatements = containsEdges.predecessors(relevantDataFlowNodes)
-				.union(relevantDataFlowNodes.nodesTaggedWithAny(XCSG.Parameter, XCSG.ReturnValue));
-		Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
-		Q slice = relevantStatements.induce(dataDependenceEdges);
-		return slice;
-	}
-	
-	/**
-	 * Returns the control flow block for the corresponding data flow node
-	 */
-	public static GraphElement getStatement(GraphElement dataFlowNode){
-		return Common.toQ(dataFlowNode).parent().eval().nodes().getFirst();
 	}
 	
 }
