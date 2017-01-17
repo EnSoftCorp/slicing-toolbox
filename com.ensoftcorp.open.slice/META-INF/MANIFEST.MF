@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Slicing Toolbox
 Bundle-SymbolicName: com.ensoftcorp.open.slice;singleton:=true
-Bundle-Version: 3.0.13.qualifier
+Bundle-Version: 3.0.14.qualifier
 Bundle-Vendor: EnSoft Corp.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: 
  org.eclipse.debug.ui,
  com.ensoftcorp.atlas.ui,
- com.ensoftcorp.open.commons;bundle-version="3.0.13"
+ com.ensoftcorp.open.commons;bundle-version="3.0.14"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
