@@ -6,16 +6,12 @@ permalink: /install/
 
 Installing the Slicing Toolbox Eclipse plugin is easy.  It is recommended to install the plugin from the provided update site, but it is also possible to install from source.
         
-### Installing Dependencies
-1. First make sure you have [Atlas](http://www.ensoftcorp.com/atlas/download/) Standard or Pro installed.
-2. When installing Atlas make sure to also include Atlas Experimental features (to include Atlas for Jimple support).
-        
 ### Installing from Update Site
 Follow the steps below to install the Slicing Toolbox plugin from the Eclipse update site.
 
 1. Start Eclipse, then select `Help` &gt; `Install New Software`.
 2. Click `Add`, in the top-right corner.
-3. In the `Add Repository` dialog that appears, enter &quot;Slicing Toolbox&quot; for the `Name` and &quot;[https://ensoftcorp.github.io/slicing-toolbox/updates/](https://ensoftcorp.github.io/slicing-toolbox/updates/)&quot; for the `Location`.
+3. In the `Add Repository` dialog that appears, enter &quot;Atlas Toolboxes&quot; for the `Name` and &quot;[https://ensoftcorp.github.io/toolbox-repository/](https://ensoftcorp.github.io/toolbox-repository/)&quot; for the `Location`.
 4. In the `Available Software` dialog, select the checkbox next to "Slicing Toolbox" and click `Next` followed by `OK`.
 5. In the next window, you'll see a list of the tools to be downloaded. Click `Next`.
 6. Read and accept the license agreements, then click `Finish`. If you get a security warning saying that the authenticity or validity of the software can't be established, click `OK`.
@@ -26,6 +22,12 @@ If you want to install from source for bleeding edge changes, first grab a copy 
 
 ## Changelog
 Note that version numbers are based off [Atlas](http://www.ensoftcorp.com/atlas/download/) version numbers.
+
+### 3.0.14
+Bug fixes for smart view selection events
+
+### 3.0.13
+Integrated toolbox commons dependencies, code cleanup
 
 ### 3.0.10
 Atlas 3.0.x compatibility updates
