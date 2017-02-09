@@ -40,7 +40,7 @@ SOFTWARE.
    <requires>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="com.ensoftcorp.atlas.ui"/>
-      <import plugin="com.ensoftcorp.open.commons" version="3.0.10" match="greaterOrEqual"/>
+      <import feature="com.ensoftcorp.open.commons.feature.group" version="3.0.14.qualifier"/>
    </requires>
 
    <plugin
