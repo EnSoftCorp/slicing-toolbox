@@ -38,7 +38,6 @@ SOFTWARE.
    </license>
 
    <requires>
-      <import plugin="org.eclipse.debug.ui"/>
       <import plugin="com.ensoftcorp.atlas.ui"/>
       <import feature="com.ensoftcorp.open.commons.feature.group" version="3.0.14.qualifier"/>
    </requires>
