@@ -81,10 +81,10 @@ public abstract class DependenceGraph {
 		 * @return
 		 */
 		public static DataDependenceGraph buildDDG(Node function){
-			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
 			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
-			Q dfg = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
-			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
+			Q localDFG = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(localDataFlowEdges);
+			Q dfg = Common.toQ(localDFG.eval());
+			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters, identity
 			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 			return ddg;
