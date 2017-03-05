@@ -35,30 +35,32 @@ public class ControlDependenceGraph extends DependenceGraph {
 	 * Removes temporary augmentation nodes and edges
 	 */
 	private boolean purgeAugmentations = true;
+
+	private static final String AUGMENTED_CFG_ENTRY = "cfg-entry";
+	private static final String AUGMENTED_CFG_EXIT = "cfg-exit";
 	
-	private Node master;
-	private Node entry;
-	private Node exit;
-	
-	public static final String AUGMENTED_CFG_ENTRY = "cfg-entry";
-	public static final String AUGMENTED_CFG_EXIT = "cfg-exit";
-	
-	public static final String AUGMENTATION_NAME = "augmentation";
-	public static final String AUGMENTATION_NODE = "augmentation-node";
-	public static final String AUGMENTATION_EDGE = "augmentation-edge";
-	
-	private Graph augmentedCFG;
-	private Graph fdt;
+	private static final String AUGMENTATION_NAME = "augmentation";
+	private static final String AUGMENTATION_NODE = "augmentation-node";
+	private static final String AUGMENTATION_EDGE = "augmentation-edge";
+
 	private Graph cdg;
+	private Graph cfg;
+	
+	public ControlDependenceGraph(Graph cfg){
+		this(cfg, false); // TODO: purge augmentations, this is causing Atlas equiv of concurrent modification exceptions in smartviews
+	}
 	
 	public ControlDependenceGraph(Graph cfg, boolean purgeAugmentations){
 		this.purgeAugmentations = purgeAugmentations;
 		
 		// sanity checks
+		Graph fdt;
+		Graph augmentedCFG;
 		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
 			this.cdg = Common.toQ(cfg).eval();
-			this.fdt = Common.empty().eval();
-			this.augmentedCFG = Common.toQ(cfg).eval();
+			this.cfg = Common.toQ(cfg).eval();
+			fdt = Common.empty().eval();
+			augmentedCFG = Common.toQ(cfg).eval();
 			return;
 		}
 		
@@ -69,6 +71,9 @@ public class ControlDependenceGraph extends DependenceGraph {
 		Q augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
 		
 		// augment the control flow root
+		Node master;
+		Node entry;
+		Node exit;
 		entry = augmentationEdges.predecessors(Common.toQ(cfRoot)).eval().nodes().getFirst();
 		if(entry == null){
 			entry = Graph.U.createNode();
@@ -117,15 +122,15 @@ public class ControlDependenceGraph extends DependenceGraph {
 			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
 		}
 		
-		this.augmentedCFG = Common.toQ(cfg)
-				.union(augmentationEdges.reverseStep(Common.toQ(cfRoot)))
-				.union(augmentationEdges.forwardStep(Common.toQ(cfExits)))
-				.union(augmentationEdges.forwardStep(Common.toQ(master)))
-				.eval();
+		augmentedCFG = Common.toQ(cfg)
+			.union(augmentationEdges.reverseStep(Common.toQ(cfRoot)))
+			.union(augmentationEdges.forwardStep(Common.toQ(cfExits)))
+			.union(augmentationEdges.forwardStep(Common.toQ(master)))
+			.eval();
 		
 		String[] entryTags = new String[] { AUGMENTED_CFG_ENTRY };
 		String[] exitTags = new String[] { AUGMENTED_CFG_EXIT };
-		this.fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
+		fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
@@ -170,37 +175,32 @@ public class ControlDependenceGraph extends DependenceGraph {
 		
 		if(purgeAugmentations){
 			// purge augmentation edges
-			for(Edge augmentationEdge : new AtlasHashSet<Edge>(Common.universe().edgesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_EDGE).eval().edges())){
-				Graph.U.delete(augmentationEdge);
+			AtlasHashSet<Edge> augmentationEdgesToRemove = new AtlasHashSet<Edge>(Common.universe().edgesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_EDGE).eval().edges());
+			while(!augmentationEdgesToRemove.isEmpty()){
+				Edge edge = augmentationEdgesToRemove.one();
+				if(edge != null){
+					Graph.U.delete(edge);
+					augmentationEdgesToRemove.remove(edge);
+				}
 			}
 			// purge augmentation nodes
-			for(Node augmentationNode : new AtlasHashSet<Node>(Common.universe().nodesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_NODE).eval().nodes())){
-				Graph.U.delete(augmentationNode);
+			AtlasHashSet<Node> augmentationNodesToRemove = new AtlasHashSet<Node>(Common.universe().nodesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_NODE).eval().nodes());
+			while(!augmentationNodesToRemove.isEmpty()){
+				Node node = augmentationNodesToRemove.one();
+				if(node != null){
+					Graph.U.delete(node);
+					augmentationNodesToRemove.remove(node);
+				}
 			}
 		}
-	}
-	
-	public ControlDependenceGraph(Graph cfg){
-		this(cfg, true);
 	}
 	
 	public Q getControlFlowGraph(){
-		return Common.toQ(augmentedCFG).difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
-	}
-	
-	public Q getAugmentedControlFlowGraph(){
-		if(purgeAugmentations){
-			throw new IllegalArgumentException("Augmentation nodes have been purged!");
-		}
-		return Common.toQ(augmentedCFG);
-	}
-	
-	public Q getForwardDominanceTree(){
-		return Common.toQ(fdt);
+		return Common.toQ(cfg);
 	}
 	
 	public Q getGraph(){
-		return Common.toQ(cdg).difference(Common.universe().nodesTaggedWithAny(AUGMENTATION_NODE));
+		return Common.toQ(cdg);
 	}
 	
 }

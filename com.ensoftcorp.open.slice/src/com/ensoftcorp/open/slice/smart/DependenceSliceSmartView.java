@@ -3,7 +3,9 @@ package com.ensoftcorp.open.slice.smart;
 import java.awt.Color;
 import java.io.IOException;
 
+import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.Node;
+import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
@@ -49,7 +51,7 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 	protected String getSlicingCriteriaSummary(AtlasSet<Node> criteria) throws IOException {
 		StringBuilder summary = new StringBuilder();
 		String prefix = "";
-		for(Node criterion : criteria){
+		for(Node criterion : new AtlasHashSet<Node>(criteria)){
 			FormattedSourceCorrespondence fsc = FormattedSourceCorrespondence.getSourceCorrespondent(criterion);
 			long startLine = fsc.getStartLineNumber();
 			long endLine = fsc.getEndLineNumber(); 
@@ -82,14 +84,15 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 		
 		// for each selected function, just show the whole dependence graph
 		Q completeDependenceGraphs = Common.empty();
-		for(Node function : functions.eval().nodes()){
+		for(Node function : new AtlasHashSet<Node>(functions.eval().nodes())){
 			DependenceGraph dg = getDependenceGraph(function);
-			completeDependenceGraphs = completeDependenceGraphs.union(dg.getGraph());
+			Graph g = dg.getGraph().eval();
+			completeDependenceGraphs = completeDependenceGraphs.union(Common.toQ(g));
 		}
 		
 		// create the slice for each function's statement 
 		Q completeResult = Common.empty();
-		for(Node function : StandardQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes()){
+		for(Node function : new AtlasHashSet<Node>(StandardQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes())){
 			Q relevantCriteria = Common.toQ(function).contained().intersection(Common.toQ(criteria));
 			DependenceGraph dg = getDependenceGraph(function);
 			completeResult = Common.toQ(completeResult.union(dg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());
