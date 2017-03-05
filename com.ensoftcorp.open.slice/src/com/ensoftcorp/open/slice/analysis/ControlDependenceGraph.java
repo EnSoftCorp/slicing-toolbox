@@ -43,7 +43,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 	private boolean purgeAugmentations;
 	
 	public ControlDependenceGraph(Graph cfg){
-		this(cfg, false); // TODO: purge augmentations, this is causing Atlas equiv of concurrent modification exceptions in smartviews
+		this(cfg, true);
 	}
 	
 	public ControlDependenceGraph(Graph cfg, boolean purgeAugmentations){
@@ -158,7 +158,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			for(Node node : nodesControlDependentOnX){
 				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
 				Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().getFirst();
-				if(controlDependenceEdge == null){
+				if(controlDependenceEdge == null && !x.taggedWith(AUGMENTATION_NODE) && !node.taggedWith(AUGMENTATION_NODE)){
 					controlDependenceEdge = Graph.U.createEdge(x, node);
 					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
 					controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);

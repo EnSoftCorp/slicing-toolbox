@@ -7,7 +7,7 @@ public class DataDependenceSliceSmartView extends DependenceSliceSmartView {
 
 	@Override
 	public String getTitle() {
-		return "Data Dependence Slice";
+		return "Data Dependence Slice (DDG)";
 	}
 
 	@Override

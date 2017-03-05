@@ -7,7 +7,7 @@ public class ProgramDependenceSliceSmartView extends DependenceSliceSmartView {
 
 	@Override
 	public String getTitle() {
-		return "Program Dependence Slice";
+		return "Program Dependence Slice (PDG)";
 	}
 	
 	@Override

@@ -7,7 +7,7 @@ public class ControlDependenceSliceSmartView extends DependenceSliceSmartView {
 
 	@Override
 	public String getTitle() {
-		return "Control Dependence Slice";
+		return "Control Dependence Slice (CDG)";
 	}
 	
 	@Override
