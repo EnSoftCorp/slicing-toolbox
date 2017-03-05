@@ -30,11 +30,6 @@ public class ControlDependenceGraph extends DependenceGraph {
 	 * Used to tag the edges between nodes that contain a control dependence
 	 */
 	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
-	
-	/**
-	 * Removes temporary augmentation nodes and edges
-	 */
-	private boolean purgeAugmentations = true;
 
 	private static final String AUGMENTED_CFG_ENTRY = "cfg-entry";
 	private static final String AUGMENTED_CFG_EXIT = "cfg-exit";
@@ -45,6 +40,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 
 	private Graph cdg;
 	private Graph cfg;
+	private boolean purgeAugmentations;
 	
 	public ControlDependenceGraph(Graph cfg){
 		this(cfg, false); // TODO: purge augmentations, this is causing Atlas equiv of concurrent modification exceptions in smartviews
