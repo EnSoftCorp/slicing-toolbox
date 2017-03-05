@@ -86,10 +86,16 @@ public class DataDependenceGraph extends DependenceGraph {
 				if(!toStatement.taggedWith(XCSG.ReturnValue)){
 					toStatement = getStatement(localDFNode);
 				}
+				Node fromStatement = field;
+				
+				if(fromStatement == null || toStatement == null || fromStatement.equals(toStatement)){
+					continue;
+				}
+				
 				Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
-				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(field), Common.toQ(toStatement)).eval().edges().getFirst();
+				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 				if(dataDependenceEdge == null){
-					dataDependenceEdge = Graph.U.createEdge(field, toStatement);
+					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
 					dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
 				}
@@ -108,7 +114,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				
 				Node toStatement = getStatement(arrayRead);
 				
-				if(fromStatement.equals(toStatement)){
+				if(fromStatement == null || toStatement == null || fromStatement.equals(toStatement)){
 					continue;
 				}
 				
@@ -134,7 +140,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				
 				Node toStatement = getStatement(arrayRead);
 				
-				if(fromStatement.equals(toStatement)){
+				if(fromStatement == null || toStatement == null || fromStatement.equals(toStatement)){
 					continue;
 				}
 				
