@@ -23,14 +23,19 @@ If you want to install from source for bleeding edge changes, first grab a copy 
 ## Changelog
 Note that version numbers are based off [Atlas](http://www.ensoftcorp.com/atlas/download/) version numbers.
 
+### 3.0.15
+- Added indexer hook with preferences option to compute PDG (smart views will still create dependence graphs on the fly if PDGs are not pre-computed in the index)
+- Added preferences page to control indexing options
+- Added support for data dependence slices on arrays and fields
+
 ### 3.0.14
-Bug fixes for smart view selection events
+- Bug fixes for smart view selection events
 
 ### 3.0.13
-Integrated toolbox commons dependencies, code cleanup
+- Integrated toolbox commons dependencies, code cleanup
 
 ### 3.0.10
-Atlas 3.0.x compatibility updates
+- Atlas 3.0.x compatibility updates
 
 ### 2.7.3
 - Initial Release
