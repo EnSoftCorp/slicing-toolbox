@@ -60,7 +60,7 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 		return summary.toString();
 	}
 	
-	protected abstract DependenceGraph getDependenceGraph(Node method);
+	protected abstract DependenceGraph getDependenceGraph(Node function);
 	
 	@Override
 	public FrontierStyledResult evaluate(IAtlasSelectionEvent event, int reverse, int forward) {

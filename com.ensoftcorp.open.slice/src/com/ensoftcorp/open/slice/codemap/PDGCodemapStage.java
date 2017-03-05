@@ -1,0 +1,50 @@
+package com.ensoftcorp.open.slice.codemap;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.ensoftcorp.atlas.core.db.graph.Node;
+import com.ensoftcorp.atlas.core.script.Common;
+import com.ensoftcorp.atlas.core.xcsg.XCSG;
+import com.ensoftcorp.open.commons.codemap.PrioritizedCodemapStage;
+import com.ensoftcorp.open.slice.analysis.DependenceGraph;
+import com.ensoftcorp.open.slice.log.Log;
+
+/**
+ * Builds the PDGs for each function
+ * 
+ * @author Ben Holland
+ */
+public class PDGCodemapStage extends PrioritizedCodemapStage {
+
+	/**
+	 * The unique identifier for the PDG codemap stage
+	 */
+	public static final String IDENTIFIER = "com.ensoftcorp.open.slice.pdg";
+	
+	
+	
+	@Override
+	public String getDisplayName() {
+		return "Program Dependence Graph";
+	}
+
+	@Override
+	public String getIdentifier() {
+		return IDENTIFIER;
+	}
+
+	@Override
+	public String[] getCodemapStageDependencies() {
+		return new String[]{}; // no dependencies
+	}
+
+	@Override
+	public void performIndexing(IProgressMonitor monitor) {
+		Log.info("Computing Program Dependence Graphs...");
+		for(Node function : Common.universe().nodesTaggedWithAny(XCSG.Function).eval().nodes()){
+			DependenceGraph.Factory.buildPDG(function);
+		}
+		Log.info("Finished Computing Program Dependence Graphs");
+	}
+
+}

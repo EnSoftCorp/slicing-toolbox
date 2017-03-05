@@ -31,22 +31,29 @@ public class ControlDependenceGraph extends DependenceGraph {
 	 */
 	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
 	
+	/**
+	 * Removes temporary augmentation nodes and edges
+	 */
+	private boolean purgeAugmentations = true;
+	
 	private Node master;
 	private Node entry;
 	private Node exit;
 	
-	private static final String CFG_ENTRY = "cfg-entry";
-	private static final String CFG_EXIT = "cfg-exit";
+	public static final String AUGMENTED_CFG_ENTRY = "cfg-entry";
+	public static final String AUGMENTED_CFG_EXIT = "cfg-exit";
 	
-	private static final String AUGMENTATION_NAME = "augmentation";
-	private static final String AUGMENTATION_NODE = "augmentation-node";
-	private static final String AUGMENTATION_EDGE = "augmentation-edge";
+	public static final String AUGMENTATION_NAME = "augmentation";
+	public static final String AUGMENTATION_NODE = "augmentation-node";
+	public static final String AUGMENTATION_EDGE = "augmentation-edge";
 	
 	private Graph augmentedCFG;
 	private Graph fdt;
 	private Graph cdg;
 	
-	public ControlDependenceGraph(Graph cfg){
+	public ControlDependenceGraph(Graph cfg, boolean purgeAugmentations){
+		this.purgeAugmentations = purgeAugmentations;
+		
 		// sanity checks
 		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
 			this.cdg = Common.toQ(cfg).eval();
@@ -66,7 +73,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		if(entry == null){
 			entry = Graph.U.createNode();
 			entry.tag(AUGMENTATION_NODE);
-			entry.tag(CFG_ENTRY);
+			entry.tag(AUGMENTED_CFG_ENTRY);
 			entry.putAttr(XCSG.name, "entry");
 			
 			Edge augmentationEdge = Graph.U.createEdge(entry, cfRoot);
@@ -80,7 +87,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		if(exit == null){
 			exit = Graph.U.createNode();
 			exit.tag(AUGMENTATION_NODE);
-			exit.tag(CFG_EXIT);
+			exit.tag(AUGMENTED_CFG_EXIT);
 			exit.putAttr(XCSG.name, "exit");
 			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
 		}
@@ -116,8 +123,8 @@ public class ControlDependenceGraph extends DependenceGraph {
 				.union(augmentationEdges.forwardStep(Common.toQ(master)))
 				.eval();
 		
-		String[] entryTags = new String[] { CFG_ENTRY };
-		String[] exitTags = new String[] { CFG_EXIT };
+		String[] entryTags = new String[] { AUGMENTED_CFG_ENTRY };
+		String[] exitTags = new String[] { AUGMENTED_CFG_EXIT };
 		this.fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
 		
 		// For each edge (X -> Y) in augmented CFG, 
@@ -160,6 +167,21 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		this.cdg = Common.toQ(controlDependenceEdgeSet).eval();
+		
+		if(purgeAugmentations){
+			// purge augmentation edges
+			for(Edge augmentationEdge : new AtlasHashSet<Edge>(Common.universe().edgesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_EDGE).eval().edges())){
+				Graph.U.delete(augmentationEdge);
+			}
+			// purge augmentation nodes
+			for(Node augmentationNode : new AtlasHashSet<Node>(Common.universe().nodesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_NODE).eval().nodes())){
+				Graph.U.delete(augmentationNode);
+			}
+		}
+	}
+	
+	public ControlDependenceGraph(Graph cfg){
+		this(cfg, true);
 	}
 	
 	public Q getControlFlowGraph(){
@@ -167,6 +189,9 @@ public class ControlDependenceGraph extends DependenceGraph {
 	}
 	
 	public Q getAugmentedControlFlowGraph(){
+		if(purgeAugmentations){
+			throw new IllegalArgumentException("Augmentation nodes have been purged!");
+		}
 		return Common.toQ(augmentedCFG);
 	}
 	

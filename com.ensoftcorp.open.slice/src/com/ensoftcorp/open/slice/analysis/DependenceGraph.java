@@ -64,26 +64,26 @@ public abstract class DependenceGraph {
 	
 	public static class Factory {
 		/**
-		 * Returns an intra-procedural Control Dependence Graph (CDG) for the given method
-		 * @param method
+		 * Returns an intra-procedural Control Dependence Graph (CDG) for the given function
+		 * @param function
 		 * @return
 		 */
-		public static ControlDependenceGraph buildCDG(Node method){
+		public static ControlDependenceGraph buildCDG(Node function){
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
+			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
 			return cdg;
 		}
 		
 		/**
-		 * Returns an intra-procedural Data Dependence Graph (DDG) for the given method
-		 * @param method
+		 * Returns an intra-procedural Data Dependence Graph (DDG) for the given function
+		 * @param function
 		 * @return
 		 */
-		public static DataDependenceGraph buildDDG(Node method){
+		public static DataDependenceGraph buildDDG(Node function){
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
 			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
-			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			Q dfg = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
 			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
 			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
@@ -91,17 +91,17 @@ public abstract class DependenceGraph {
 		}
 		
 		/**
-		 * Returns an intra-procedural Program Dependence Graph (PDG) for the given method
-		 * @param method
+		 * Returns an intra-procedural Program Dependence Graph (PDG) for the given function
+		 * @param function
 		 * @return
 		 */
-		public static ProgramDependenceGraph buildPDG(Node method){
+		public static ProgramDependenceGraph buildPDG(Node function){
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-			Q cfg = controlFlowEdges.forward(Common.toQ(method).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
+			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
 			
 			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
 			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
-			Q dfg = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			Q dfg = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
 			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
 			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			

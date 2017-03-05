@@ -11,8 +11,8 @@ public class DataDependenceSliceSmartView extends DependenceSliceSmartView {
 	}
 
 	@Override
-	protected DependenceGraph getDependenceGraph(Node method) {
-		return DependenceGraph.Factory.buildDDG(method);
+	protected DependenceGraph getDependenceGraph(Node function) {
+		return DependenceGraph.Factory.buildDDG(function);
 	}
 
 }

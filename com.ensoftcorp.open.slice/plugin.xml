@@ -2,6 +2,25 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <!-- create an initializer extension to initialize preferences -->
+   <extension
+      point="org.eclipse.equinox.preferences.preferences">
+	   <initializer
+	         class="com.ensoftcorp.open.slice.preferences.SlicePreferences">
+	   </initializer>
+	</extension>
+
+   <!-- add slice toolbox preference page -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.ensoftcorp.open.slice.ui.SlicePreferencesPage"
+            id="com.ensoftcorp.open.slice.ui.preferences"
+            name="Program Slicing"
+            category="com.ensoftcorp.open.commons.ui.toolbox.preferences">
+      </page>
+   </extension>
+
    <!-- add the slicing smart views -->
    <extension
          point="com.ensoftcorp.atlas.ui.smartViewScript">
@@ -14,6 +33,11 @@
       <script
             class="com.ensoftcorp.open.slice.smart.ProgramDependenceSliceSmartView">
       </script>
+   </extension>
+   
+   <!-- adds the prioritized codemap stage for pdg computations -->
+   <extension point="com.ensoftcorp.open.commons.codemap">
+      <codemap class="com.ensoftcorp.open.slice.codemap.PDGCodemapStage"></codemap>
    </extension>
 
 </plugin>
