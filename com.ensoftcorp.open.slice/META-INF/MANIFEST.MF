@@ -10,4 +10,5 @@ Require-Bundle: com.ensoftcorp.atlas.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
-Export-Package: com.ensoftcorp.open.slice.analysis
+Export-Package: com.ensoftcorp.open.slice.analysis,
+ com.ensoftcorp.open.slice.preferences
