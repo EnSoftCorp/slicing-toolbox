@@ -22,7 +22,7 @@ private static boolean initialized = false;
 	 */
 	public static void enableComputeProgramDependenceGraphs(boolean enabled){
 		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
-		preferences.setDefault(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, enabled);
+		preferences.setValue(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, enabled);
 		loadPreferences();
 	}
 	
@@ -36,7 +36,7 @@ private static boolean initialized = false;
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
-		setDefaults(preferences);
+		preferences.setDefault(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT);
 	}
 	
 	/**
@@ -44,12 +44,8 @@ private static boolean initialized = false;
 	 */
 	public static void restoreDefaults(){
 		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
-		setDefaults(preferences);
+		preferences.setValue(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT);
 		loadPreferences();
-	}
-	
-	private static void setDefaults(IPreferenceStore preferences) {
-		preferences.setDefault(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT);
 	}
 	
 	/**
