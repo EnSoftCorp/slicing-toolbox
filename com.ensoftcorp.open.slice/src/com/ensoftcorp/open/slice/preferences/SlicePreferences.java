@@ -17,7 +17,16 @@ private static boolean initialized = false;
 	public static final Boolean COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT = false;
 	private static boolean computeProgramDependenceGraphsValue = COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT;
 	
-	public static boolean isDecompiledLoopRecoveryEnabled(){
+	/**
+	 * Configures inference rule logging
+	 */
+	public static void enableComputeProgramDependenceGraphs(boolean enabled){
+		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
+		preferences.setDefault(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, enabled);
+		loadPreferences();
+	}
+	
+	public static boolean isComputeProgramDependenceGraphsEnabled(){
 		if(!initialized){
 			loadPreferences();
 		}
@@ -27,6 +36,19 @@ private static boolean initialized = false;
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
+		setDefaults(preferences);
+	}
+	
+	/**
+	 * Restores the default preferences
+	 */
+	public static void restoreDefaults(){
+		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
+		setDefaults(preferences);
+		loadPreferences();
+	}
+	
+	private static void setDefaults(IPreferenceStore preferences) {
 		preferences.setDefault(COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT);
 	}
 	
