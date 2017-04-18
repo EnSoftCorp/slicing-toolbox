@@ -10,6 +10,7 @@ import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.algorithms.ForwardDominanceTree;
+import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitControlFlowGraph;
 import com.ensoftcorp.open.commons.analysis.StandardQueries;
 import com.ensoftcorp.open.slice.log.Log;
 
@@ -123,7 +124,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		
 		String[] entryTags = new String[] { AUGMENTED_CFG_ENTRY };
 		String[] exitTags = new String[] { AUGMENTED_CFG_EXIT };
-		fdt = new ForwardDominanceTree(augmentedCFG, entryTags, exitTags).getForwardDominanceTree();
+		fdt = new ForwardDominanceTree(new UniqueEntryExitControlFlowGraph(augmentedCFG, entryTags, exitTags)).getForwardDominanceTree();
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
