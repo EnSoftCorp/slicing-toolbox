@@ -40,15 +40,12 @@ public class ControlDependenceGraph extends DependenceGraph {
 
 	private Graph cdg;
 	private Graph cfg;
-	private boolean purgeAugmentations;
-	
+
 	public ControlDependenceGraph(Graph cfg){
 		this(cfg, true);
 	}
 	
 	public ControlDependenceGraph(Graph cfg, boolean purgeAugmentations){
-		this.purgeAugmentations = purgeAugmentations;
-		
 		// sanity checks
 		Graph fdt;
 		Graph augmentedCFG;
