@@ -17,7 +17,7 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.utilities.FormattedSourceCorrespondence;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
@@ -92,7 +92,7 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 		
 		// create the slice for each function's statement 
 		Q completeResult = Common.empty();
-		for(Node function : new AtlasHashSet<Node>(StandardQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes())){
+		for(Node function : new AtlasHashSet<Node>(CommonQueries.getContainingFunctions(Common.toQ(criteria)).eval().nodes())){
 			Q relevantCriteria = Common.toQ(function).contained().intersection(Common.toQ(criteria));
 			DependenceGraph dg = getDependenceGraph(function);
 			completeResult = Common.toQ(completeResult.union(dg.getSlice(SliceDirection.BI_DIRECTIONAL, relevantCriteria.eval().nodes())).eval());

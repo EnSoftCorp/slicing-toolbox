@@ -11,7 +11,7 @@ import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.algorithms.ForwardDominanceTree;
 import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitControlFlowGraph;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
 
 /**
@@ -136,7 +136,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			Node y = cfEdge.getNode(EdgeDirection.TO);
 			
 			// least common ancestor in forward dominance tree
-			Node lca = StandardQueries.leastCommonAncestor(x, y, fdt);
+			Node lca = CommonQueries.leastCommonAncestor(x, y, fdt);
 			
 			// sanity check
 			if(lca == null){

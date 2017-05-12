@@ -9,7 +9,7 @@ import com.ensoftcorp.atlas.core.markup.IMarkup;
 import com.ensoftcorp.atlas.core.markup.MarkupFromH;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 
 /**
  * A program dependence graph based taint graph (also known as chopping)
@@ -27,8 +27,8 @@ public class TaintGraph {
 		this.source = source;
 		this.sink = sink;
 		
-		Node sourceFunction = StandardQueries.getContainingFunction(source);
-		Node sinkFunction = StandardQueries.getContainingFunction(sink);
+		Node sourceFunction = CommonQueries.getContainingFunction(source);
+		Node sinkFunction = CommonQueries.getContainingFunction(sink);
 		
 		// only considering intra-procedural case
 		if(sourceFunction.equals(sinkFunction)){
