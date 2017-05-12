@@ -22,8 +22,6 @@ public class PDGCodemapStage extends PrioritizedCodemapStage {
 	 */
 	public static final String IDENTIFIER = "com.ensoftcorp.open.slice.pdg";
 	
-	
-	
 	@Override
 	public String getDisplayName() {
 		return "Program Dependence Graph";
