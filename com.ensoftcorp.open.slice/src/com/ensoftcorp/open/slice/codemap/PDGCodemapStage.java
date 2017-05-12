@@ -8,6 +8,7 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.codemap.PrioritizedCodemapStage;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.log.Log;
+import com.ensoftcorp.open.slice.preferences.SlicePreferences;
 
 /**
  * Builds the PDGs for each function
@@ -40,11 +41,12 @@ public class PDGCodemapStage extends PrioritizedCodemapStage {
 
 	@Override
 	public void performIndexing(IProgressMonitor monitor) {
-		Log.info("Computing Program Dependence Graphs...");
-		for(Node function : Common.universe().nodesTaggedWithAny(XCSG.Function).eval().nodes()){
-			DependenceGraph.Factory.buildPDG(function);
+		if(SlicePreferences.isComputeProgramDependenceGraphsEnabled()){
+			Log.info("Computing Program Dependence Graphs...");
+			for(Node function : Common.universe().nodesTaggedWithAny(XCSG.Function).eval().nodes()){
+				DependenceGraph.Factory.buildPDG(function);
+			}
 		}
-		Log.info("Finished Computing Program Dependence Graphs");
 	}
 
 }
