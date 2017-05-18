@@ -10,7 +10,7 @@ import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.algorithms.ForwardDominanceTree;
-import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitControlFlowGraph;
+import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitCustomGraph;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
 
@@ -59,7 +59,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		// augment the cfg with a master entry node and a master exit node
-		Node cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().getFirst();
+		Node cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().one();
 		AtlasSet<Node> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
 		
 		Q augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
@@ -68,7 +68,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		Node master;
 		Node entry;
 		Node exit;
-		entry = augmentationEdges.predecessors(Common.toQ(cfRoot)).eval().nodes().getFirst();
+		entry = augmentationEdges.predecessors(Common.toQ(cfRoot)).eval().nodes().one();
 		if(entry == null){
 			entry = Graph.U.createNode();
 			entry.tag(AUGMENTATION_NODE);
@@ -82,7 +82,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		// augment the control flow exits
-		exit = augmentationEdges.successors(Common.toQ(cfExits)).eval().nodes().getFirst();
+		exit = augmentationEdges.successors(Common.toQ(cfExits)).eval().nodes().one();
 		if(exit == null){
 			exit = Graph.U.createNode();
 			exit.tag(AUGMENTATION_NODE);
@@ -100,7 +100,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		// add a master augmentation node with an edge to the start and the exit
-		master = augmentationEdges.predecessors(Common.toQ(entry)).intersection(augmentationEdges.predecessors(Common.toQ(exit))).eval().nodes().getFirst();
+		master = augmentationEdges.predecessors(Common.toQ(entry)).intersection(augmentationEdges.predecessors(Common.toQ(exit))).eval().nodes().one();
 		if(master == null){
 			master = Graph.U.createNode();
 			master.tag(AUGMENTATION_NODE);
@@ -122,9 +122,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			.union(augmentationEdges.forwardStep(Common.toQ(master)))
 			.eval();
 		
-		String[] entryTags = new String[] { AUGMENTED_CFG_ENTRY };
-		String[] exitTags = new String[] { AUGMENTED_CFG_EXIT };
-		fdt = new ForwardDominanceTree(new UniqueEntryExitControlFlowGraph(augmentedCFG, entryTags, exitTags)).getForwardDominanceTree();
+		fdt = new ForwardDominanceTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit)).getForwardDominanceTree();
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
@@ -155,7 +153,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			// add control dependence edges
 			for(Node node : nodesControlDependentOnX){
 				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
-				Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().getFirst();
+				Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().one();
 				if(controlDependenceEdge == null && !x.taggedWith(AUGMENTATION_NODE) && !node.taggedWith(AUGMENTATION_NODE)){
 					controlDependenceEdge = Graph.U.createEdge(x, node);
 					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
