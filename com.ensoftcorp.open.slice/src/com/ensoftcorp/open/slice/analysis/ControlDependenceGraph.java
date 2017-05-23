@@ -122,7 +122,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			.union(augmentationEdges.forwardStep(Common.toQ(master)))
 			.eval();
 		
-		fdt = new ForwardDominanceTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit)).getForwardDominanceTree();
+		fdt = ForwardDominanceTree.computeDominatorTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit));
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
