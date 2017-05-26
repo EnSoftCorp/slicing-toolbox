@@ -9,7 +9,7 @@ import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.commons.algorithms.ForwardDominanceTree;
+import com.ensoftcorp.open.commons.algorithms.DominanceAnalysis;
 import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitCustomGraph;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
@@ -122,7 +122,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			.union(augmentationEdges.forwardStep(Common.toQ(master)))
 			.eval();
 		
-		fdt = ForwardDominanceTree.computeDominatorTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit));
+		fdt = DominanceAnalysis.computeForwardDominatorTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit));
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
