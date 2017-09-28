@@ -25,13 +25,13 @@
    <extension
          point="com.ensoftcorp.atlas.ui.smartViewScript">
       <script
-            class="com.ensoftcorp.open.slice.smart.ControlDependenceSliceSmartView">
+            class="com.ensoftcorp.open.slice.ui.smart.ControlDependenceSliceSmartView">
       </script>
       <script
-            class="com.ensoftcorp.open.slice.smart.DataDependenceSliceSmartView">
+            class="com.ensoftcorp.open.slice.ui.smart.DataDependenceSliceSmartView">
       </script>
       <script
-            class="com.ensoftcorp.open.slice.smart.ProgramDependenceSliceSmartView">
+            class="com.ensoftcorp.open.slice.ui.smart.ProgramDependenceSliceSmartView">
       </script>
    </extension>
    

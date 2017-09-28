@@ -1,4 +1,4 @@
-package com.ensoftcorp.open.slice.smart;
+package com.ensoftcorp.open.slice.ui.smart;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -15,14 +15,17 @@ import com.ensoftcorp.atlas.core.script.FrontierStyledResult;
 import com.ensoftcorp.atlas.core.script.StyledResult;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.ui.scripts.selections.FilteringAtlasSmartViewScript;
+import com.ensoftcorp.atlas.ui.scripts.selections.IExplorableScript;
 import com.ensoftcorp.atlas.ui.scripts.selections.IResizableScript;
+import com.ensoftcorp.atlas.ui.scripts.util.SimpleScriptUtil;
+import com.ensoftcorp.atlas.ui.selection.event.FrontierEdgeExploreEvent;
 import com.ensoftcorp.atlas.ui.selection.event.IAtlasSelectionEvent;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.utilities.FormattedSourceCorrespondence;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 
-public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript {
+public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewScript implements IResizableScript, IExplorableScript {
 
 	@Override
 	protected String[] getSupportedNodeTags() {
@@ -63,6 +66,11 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 	}
 	
 	protected abstract DependenceGraph getDependenceGraph(Node function);
+	
+	@Override
+	public FrontierStyledResult explore(FrontierEdgeExploreEvent event, FrontierStyledResult oldResult) {
+		return SimpleScriptUtil.explore(this, event, oldResult);
+	}
 	
 	@Override
 	public FrontierStyledResult evaluate(IAtlasSelectionEvent event, int reverse, int forward) {
