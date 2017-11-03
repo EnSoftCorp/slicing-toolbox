@@ -1,18 +1,18 @@
-package com.ensoftcorp.open.slice.ui.smart;
+package com.ensoftcorp.open.slice.ui.codepainter;
 
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 
-public class ControlDependenceSliceSmartView extends DependenceSliceSmartView {
+public class DataDependenceSliceCodePainter extends DependenceSliceCodePainter {
 
 	@Override
 	public String getTitle() {
-		return "Control Dependence Slice (CDG)";
+		return "Data Dependence Slice (DDG)";
 	}
 	
 	@Override
 	protected DependenceGraph getDependenceGraph(Node function) {
-		return DependenceGraph.Factory.buildCDG(function);
+		return DependenceGraph.Factory.buildDDG(function);
 	}
 
 }

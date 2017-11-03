@@ -1,9 +1,9 @@
-package com.ensoftcorp.open.slice.ui.smart;
+package com.ensoftcorp.open.slice.ui.codepainter;
 
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 
-public class ProgramDependenceSliceSmartView extends DependenceSliceSmartView {
+public class ProgramDependenceSliceCodePainter extends DependenceSliceCodePainter {
 
 	@Override
 	public String getTitle() {
@@ -14,5 +14,5 @@ public class ProgramDependenceSliceSmartView extends DependenceSliceSmartView {
 	protected DependenceGraph getDependenceGraph(Node function) {
 		return DependenceGraph.Factory.buildPDG(function);
 	}
-	
+
 }

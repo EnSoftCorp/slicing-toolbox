@@ -20,19 +20,12 @@
             category="com.ensoftcorp.open.commons.ui.toolbox.preferences">
       </page>
    </extension>
-
-   <!-- add the slicing smart views -->
-   <extension
-         point="com.ensoftcorp.atlas.ui.smartViewScript">
-      <script
-            class="com.ensoftcorp.open.slice.ui.smart.ControlDependenceSliceSmartView">
-      </script>
-      <script
-            class="com.ensoftcorp.open.slice.ui.smart.DataDependenceSliceSmartView">
-      </script>
-      <script
-            class="com.ensoftcorp.open.slice.ui.smart.ProgramDependenceSliceSmartView">
-      </script>
+   
+   <!-- adds codepainter definitions -->
+   <extension point="com.ensoftcorp.open.commons.codepainter">
+      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.ControlDependenceSliceCodePainter"></codepainter>
+      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.DataDependenceSliceCodePainter"></codepainter>
+      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.ProgramDependenceSliceCodePainter"></codepainter>
    </extension>
    
    <!-- adds the prioritized codemap stage for pdg computations -->
