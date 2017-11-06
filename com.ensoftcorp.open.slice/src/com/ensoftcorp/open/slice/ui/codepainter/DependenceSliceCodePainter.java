@@ -19,9 +19,11 @@ import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 
 public abstract class DependenceSliceCodePainter extends CodePainter {
 
+	private ColorPalette programDependenceColorPalette = new ProgramDependenceColorPalette();
+	
 	@Override
-	public ColorPalette getBaseColorPalette() {
-		return ColorPalette.getEmptyColorPalette();
+	public ColorPalette getComputationSpecificColorPalette() {
+		return programDependenceColorPalette;
 	}
 
 	@Override
