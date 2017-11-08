@@ -1,6 +1,8 @@
 package com.ensoftcorp.open.slice.ui.codepainter;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.Node;
@@ -18,13 +20,6 @@ import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph.SliceDirection;
 
 public abstract class DependenceSliceCodePainter extends CodePainter {
-
-	private ColorPalette programDependenceColorPalette = new ProgramDependenceColorPalette();
-	
-	@Override
-	public ColorPalette getComputationSpecificColorPalette() {
-		return programDependenceColorPalette;
-	}
 
 	@Override
 	public String getCategory() {
@@ -134,5 +129,14 @@ public abstract class DependenceSliceCodePainter extends CodePainter {
 	}
 	
 	protected abstract DependenceGraph getDependenceGraph(Node function);
+
+	
+	@Override
+	public List<ColorPalette> getDefaultColorPalettes() {
+		List<ColorPalette> result = new LinkedList<ColorPalette>();
+		result.add(new ProgramDependenceColorPalette());
+		return result;
+	}
+
 
 }
