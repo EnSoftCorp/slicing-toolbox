@@ -7,7 +7,12 @@ public class ControlDependenceSliceCodePainter extends DependenceSliceCodePainte
 
 	@Override
 	public String getTitle() {
-		return "Control Dependence Slice (CDG)";
+		return "Control Dependence Slice";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Explores the control dependence graph (CDG).";
 	}
 	
 	@Override

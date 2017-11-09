@@ -27,22 +27,22 @@ public abstract class DependenceSliceCodePainter extends CodePainter {
 	}
 
 	@Override
-	protected String[] getSupportedNodeTags() {
+	public String[] getSupportedNodeTags() {
 		return new String[] { XCSG.ControlFlow_Node, XCSG.DataFlow_Node, XCSG.Function };
 	}
 	
 	@Override
-	protected String[] getSupportedEdgeTags() {
+	public String[] getSupportedEdgeTags() {
 		return NOTHING;
 	}
 
 	@Override
-	public int getDefaultStepTop() {
+	public int getDefaultStepReverse() {
 		return 1;
 	}
 	
 	@Override
-	public int getDefaultStepBottom() {
+	public int getDefaultStepForward() {
 		return 1;
 	}
 	

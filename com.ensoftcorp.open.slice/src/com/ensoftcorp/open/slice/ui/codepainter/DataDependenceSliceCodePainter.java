@@ -7,7 +7,12 @@ public class DataDependenceSliceCodePainter extends DependenceSliceCodePainter {
 
 	@Override
 	public String getTitle() {
-		return "Data Dependence Slice (DDG)";
+		return "Data Dependence Slice";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Explores the data dependence graph (DDG).";
 	}
 	
 	@Override
