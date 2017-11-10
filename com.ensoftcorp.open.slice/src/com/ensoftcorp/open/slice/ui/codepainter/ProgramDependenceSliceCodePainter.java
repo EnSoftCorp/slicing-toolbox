@@ -6,7 +6,7 @@ import com.ensoftcorp.open.slice.analysis.DependenceGraph;
 public class ProgramDependenceSliceCodePainter extends DependenceSliceCodePainter {
 
 	@Override
-	public String getTitle() {
+	public String getName() {
 		return "Program Dependence Slice";
 	}
 	
