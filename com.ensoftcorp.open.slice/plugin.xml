@@ -28,6 +28,13 @@
       <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.ProgramDependenceSliceCodePainter"></codepainter>
    </extension>
    
+   <!-- add smart views definitons -->
+   <extension point="com.ensoftcorp.atlas.ui.smartViewScript">
+      <script class="com.ensoftcorp.open.slice.ui.smart.ControlDependenceSliceSmartView"></script>
+      <script class="com.ensoftcorp.open.slice.ui.smart.DataDependenceSliceSmartView"></script>
+      <script class="com.ensoftcorp.open.slice.ui.smart.ProgramDependenceSliceSmartView"></script>
+   </extension>
+   
    <!-- adds the prioritized codemap stage for pdg computations -->
    <extension point="com.ensoftcorp.open.commons.codemap">
       <codemap class="com.ensoftcorp.open.slice.codemap.PDGCodemapStage"></codemap>
