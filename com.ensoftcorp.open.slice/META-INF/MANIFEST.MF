@@ -12,3 +12,4 @@ Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
 Export-Package: com.ensoftcorp.open.slice.analysis,
  com.ensoftcorp.open.slice.preferences
+Automatic-Module-Name: com.ensoftcorp.open.slice
