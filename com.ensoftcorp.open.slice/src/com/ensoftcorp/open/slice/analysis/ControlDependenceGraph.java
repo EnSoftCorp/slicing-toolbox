@@ -39,17 +39,21 @@ public class ControlDependenceGraph extends DependenceGraph {
 	private static final String AUGMENTATION_NODE = "augmentation-node";
 	private static final String AUGMENTATION_EDGE = "augmentation-edge";
 
-	private Graph cdg;
 	private Graph cfg;
+	private Graph augmentedCFG;
+	private Graph fdt;
+	private Graph cdg;
+	
+	private boolean purgeAugmentations;
 
 	public ControlDependenceGraph(Graph cfg){
 		this(cfg, true);
 	}
 	
 	public ControlDependenceGraph(Graph cfg, boolean purgeAugmentations){
+		this.purgeAugmentations = purgeAugmentations;
+		
 		// sanity checks
-		Graph fdt;
-		Graph augmentedCFG;
 		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
 			this.cdg = Common.toQ(cfg).eval();
 			this.cfg = Common.toQ(cfg).eval();
@@ -122,7 +126,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			.union(augmentationEdges.forwardStep(Common.toQ(master)))
 			.eval();
 		
-		fdt = DominanceAnalysis.computePostDominance(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit));
+		fdt = DominanceAnalysis.computePostDominanceTree(new UniqueEntryExitCustomGraph(augmentedCFG, entry, exit));
 		
 		// For each edge (X -> Y) in augmented CFG, 
 		// find nodes in the forward dominance tree from Y
@@ -152,14 +156,16 @@ public class ControlDependenceGraph extends DependenceGraph {
 			
 			// add control dependence edges
 			for(Node node : nodesControlDependentOnX){
-				Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
-				Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().one();
-				if(controlDependenceEdge == null && !x.taggedWith(AUGMENTATION_NODE) && !node.taggedWith(AUGMENTATION_NODE)){
-					controlDependenceEdge = Graph.U.createEdge(x, node);
-					controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
-					controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);
+				if(!x.equals(node)) {
+					Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
+					Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().one();
+					if(controlDependenceEdge == null && !x.taggedWith(AUGMENTATION_NODE) && !node.taggedWith(AUGMENTATION_NODE)){
+						controlDependenceEdge = Graph.U.createEdge(x, node);
+						controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
+						controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);
+					}
+					controlDependenceEdgeSet.add(controlDependenceEdge);
 				}
-				controlDependenceEdgeSet.add(controlDependenceEdge);
 			}
 		}
 		
@@ -189,6 +195,17 @@ public class ControlDependenceGraph extends DependenceGraph {
 	
 	public Q getControlFlowGraph(){
 		return Common.toQ(cfg);
+	}
+	
+	public Q getForwardDominanceTree(){
+		return Common.toQ(fdt);
+	}
+	
+	public Q getAugmentedControlFlowGraph() {
+		if(purgeAugmentations) {
+			throw new IllegalArgumentException("Augmented CFG has been purged.");
+		}
+		return Common.toQ(augmentedCFG);
 	}
 	
 	public Q getGraph(){

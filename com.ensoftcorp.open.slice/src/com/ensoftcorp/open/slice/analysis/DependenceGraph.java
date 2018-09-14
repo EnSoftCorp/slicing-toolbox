@@ -63,15 +63,20 @@ public abstract class DependenceGraph {
 	}
 	
 	public static class Factory {
+		
 		/**
 		 * Returns an intra-procedural Control Dependence Graph (CDG) for the given function
 		 * @param function
 		 * @return
 		 */
 		public static ControlDependenceGraph buildCDG(Node function){
+			return buildCDG(function, true);
+		}
+		
+		public static ControlDependenceGraph buildCDG(Node function, boolean purgeAugmentations){
 			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
-			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
+			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval(), purgeAugmentations);
 			return cdg;
 		}
 		
