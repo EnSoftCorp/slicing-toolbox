@@ -40,10 +40,20 @@ SOFTWARE.
    <requires>
       <import plugin="com.ensoftcorp.atlas.ui"/>
       <import feature="com.ensoftcorp.open.commons.feature" version="3.3.7.qualifier"/>
+      <import plugin="com.ensoftcorp.open.commons" version="3.3.7" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.commons.ui" version="3.3.7" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.slice" version="3.3.7" match="greaterOrEqual"/>
    </requires>
 
    <plugin
          id="com.ensoftcorp.open.slice"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.ensoftcorp.open.slice.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

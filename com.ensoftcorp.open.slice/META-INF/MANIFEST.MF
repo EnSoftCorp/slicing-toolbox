@@ -6,11 +6,15 @@ Bundle-Version: 3.3.7.qualifier
 Bundle-Vendor: EnSoft Corp.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: com.ensoftcorp.atlas.ui,
- com.ensoftcorp.open.commons;bundle-version="3.3.7",
- com.ensoftcorp.open.commons.ui;bundle-version="3.3.7"
+ com.ensoftcorp.open.commons;bundle-version="3.3.7"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Activator: com.ensoftcorp.open.slice.Activator
-Export-Package: com.ensoftcorp.open.slice.analysis,
- com.ensoftcorp.open.slice.preferences
+Export-Package: com.ensoftcorp.open.slice.analysis;
+  uses:="com.ensoftcorp.atlas.core.db.set,
+   com.ensoftcorp.atlas.core.query,
+   com.ensoftcorp.atlas.core.highlight,
+   com.ensoftcorp.atlas.core.db.graph,
+   com.ensoftcorp.atlas.core.markup",
+ com.ensoftcorp.open.slice.preferences;uses:="org.eclipse.core.runtime.preferences"
 Automatic-Module-Name: com.ensoftcorp.open.slice

@@ -8,31 +8,6 @@
 	   <initializer
 	         class="com.ensoftcorp.open.slice.preferences.SlicePreferences">
 	   </initializer>
-	</extension>
-
-   <!-- add slice toolbox preference page -->
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="com.ensoftcorp.open.slice.ui.SlicePreferencesPage"
-            id="com.ensoftcorp.open.slice.ui.preferences"
-            name="Program Slicing"
-            category="com.ensoftcorp.open.commons.ui.toolbox.preferences">
-      </page>
-   </extension>
-   
-   <!-- adds codepainter definitions -->
-   <extension point="com.ensoftcorp.open.commons.codepainter">
-      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.ControlDependenceSliceCodePainter"></codepainter>
-      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.DataDependenceSliceCodePainter"></codepainter>
-      <codepainter class="com.ensoftcorp.open.slice.ui.codepainter.ProgramDependenceSliceCodePainter"></codepainter>
-   </extension>
-   
-   <!-- add smart views definitons -->
-   <extension point="com.ensoftcorp.atlas.ui.smartViewScript">
-      <script class="com.ensoftcorp.open.slice.ui.smart.ControlDependenceSliceSmartView"></script>
-      <script class="com.ensoftcorp.open.slice.ui.smart.DataDependenceSliceSmartView"></script>
-      <script class="com.ensoftcorp.open.slice.ui.smart.ProgramDependenceSliceSmartView"></script>
    </extension>
    
    <!-- adds the prioritized codemap stage for pdg computations -->
