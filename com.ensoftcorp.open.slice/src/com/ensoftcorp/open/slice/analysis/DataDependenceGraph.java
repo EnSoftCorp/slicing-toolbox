@@ -108,7 +108,7 @@ public class DataDependenceGraph extends DependenceGraph {
 			}
 			
 			Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
-			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
+			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 			if(dataDependenceEdge == null){
 				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
@@ -136,7 +136,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				}
 				
 				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
-				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
+				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
@@ -162,7 +162,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				}
 				
 				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
-				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
+				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
@@ -188,7 +188,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				}
 				
 				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
-				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
+				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
