@@ -7,6 +7,7 @@ import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.algorithms.DominanceAnalysis;
@@ -63,10 +64,10 @@ public class ControlDependenceGraph extends DependenceGraph {
 		}
 		
 		// augment the cfg with a master entry node and a master exit node
-		Node cfRoot = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowRoot).eval().nodes().one();
-		AtlasSet<Node> cfExits = Common.toQ(cfg).nodesTaggedWithAny(XCSG.controlFlowExitPoint).eval().nodes();
+		Node cfRoot = Common.toQ(cfg).nodes(XCSG.controlFlowRoot).eval().nodes().one();
+		AtlasSet<Node> cfExits = Common.toQ(cfg).nodes(XCSG.controlFlowExitPoint).eval().nodes();
 		
-		Q augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
+		Q augmentationEdges = Query.universe().edges(AUGMENTATION_EDGE);
 		
 		// augment the control flow root
 		Node master;
@@ -82,7 +83,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			Edge augmentationEdge = Graph.U.createEdge(entry, cfRoot);
 			augmentationEdge.tag(AUGMENTATION_EDGE);
 			augmentationEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
-			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
+			augmentationEdges = Query.universe().edges(AUGMENTATION_EDGE);
 		}
 		
 		// augment the control flow exits
@@ -92,14 +93,14 @@ public class ControlDependenceGraph extends DependenceGraph {
 			exit.tag(AUGMENTATION_NODE);
 			exit.tag(AUGMENTED_CFG_EXIT);
 			exit.putAttr(XCSG.name, "exit");
-			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
+			augmentationEdges = Query.universe().edges(AUGMENTATION_EDGE);
 		}
 		for(Node cfExit : cfExits){
 			if(augmentationEdges.successors(Common.toQ(cfExit)).eval().nodes().isEmpty()){
 				Edge augmentationEdge = Graph.U.createEdge(cfExit, exit);
 				augmentationEdge.tag(AUGMENTATION_EDGE);
 				augmentationEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
-				augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
+				augmentationEdges = Query.universe().edges(AUGMENTATION_EDGE);
 			}
 		}
 		
@@ -117,7 +118,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			Edge augmentationExitEdge = Graph.U.createEdge(master, exit);
 			augmentationExitEdge.tag(AUGMENTATION_EDGE);
 			augmentationExitEdge.putAttr(XCSG.name, AUGMENTATION_NAME);
-			augmentationEdges = Common.universe().edgesTaggedWithAny(AUGMENTATION_EDGE);
+			augmentationEdges = Query.universe().edges(AUGMENTATION_EDGE);
 		}
 		
 		augmentedCFG = Common.toQ(cfg)
@@ -157,7 +158,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 			// add control dependence edges
 			for(Node node : nodesControlDependentOnX){
 				if(!x.equals(node)) {
-					Q controlDependenceEdges = Common.universe().edgesTaggedWithAny(CONTROL_DEPENDENCE_EDGE);
+					Q controlDependenceEdges = Query.universe().edges(CONTROL_DEPENDENCE_EDGE);
 					Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(x), Common.toQ(node)).eval().edges().one();
 					if(controlDependenceEdge == null && !x.taggedWith(AUGMENTATION_NODE) && !node.taggedWith(AUGMENTATION_NODE)){
 						controlDependenceEdge = Graph.U.createEdge(x, node);
@@ -173,7 +174,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 		
 		if(purgeAugmentations){
 			// purge augmentation edges
-			AtlasHashSet<Edge> augmentationEdgesToRemove = new AtlasHashSet<Edge>(Common.universe().edgesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_EDGE).eval().edges());
+			AtlasHashSet<Edge> augmentationEdgesToRemove = new AtlasHashSet<Edge>(Query.universe().edges(ControlDependenceGraph.AUGMENTATION_EDGE).eval().edges());
 			while(!augmentationEdgesToRemove.isEmpty()){
 				Edge edge = augmentationEdgesToRemove.one();
 				if(edge != null){
@@ -182,7 +183,7 @@ public class ControlDependenceGraph extends DependenceGraph {
 				}
 			}
 			// purge augmentation nodes
-			AtlasHashSet<Node> augmentationNodesToRemove = new AtlasHashSet<Node>(Common.universe().nodesTaggedWithAny(ControlDependenceGraph.AUGMENTATION_NODE).eval().nodes());
+			AtlasHashSet<Node> augmentationNodesToRemove = new AtlasHashSet<Node>(Query.universe().nodes(ControlDependenceGraph.AUGMENTATION_NODE).eval().nodes());
 			while(!augmentationNodesToRemove.isEmpty()){
 				Node node = augmentationNodesToRemove.one();
 				if(node != null){

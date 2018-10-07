@@ -3,6 +3,7 @@ package com.ensoftcorp.open.slice.analysis;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
@@ -14,7 +15,7 @@ public class SystemDependenceGraph extends DependenceGraph {
 	public SystemDependenceGraph(){
 		if(sdg == null){
 			sdg = Common.empty().eval();
-			for(Node function : Common.universe().nodes(XCSG.Function).eval().nodes()){
+			for(Node function : Query.universe().nodes(XCSG.Function).eval().nodes()){
 				Graph dfg = CommonQueries.dfg(Common.toQ(function)).eval();
 				Graph cfg = CommonQueries.cfg(Common.toQ(function)).eval();
 				Graph pdg = new ProgramDependenceGraph(cfg, dfg).getGraph().eval();

@@ -7,6 +7,7 @@ import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
@@ -61,7 +62,7 @@ public class DataDependenceGraph extends DependenceGraph {
 							// create a data dependency edge from the initialization statement to the instantiation statement
 							// if one does not already exist
 							if(!initializationStatement.equals(instantiationStatement)) {
-								if(CommonQueries.isEmpty(Common.universe().edges(DataDependenceGraph.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
+								if(CommonQueries.isEmpty(Query.universe().edges(DataDependenceGraph.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
 									Edge dataDependenceEdge = Graph.U.createEdge(initializationStatement, instantiationStatement);
 									dataDependenceEdge.tag(DataDependenceGraph.DATA_DEPENDENCE_EDGE);
 									dataDependenceEdge.tag(DataDependenceGraph.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE);
@@ -106,7 +107,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				continue;
 			}
 			
-			Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
+			Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
 			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 			if(dataDependenceEdge == null){
 				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
@@ -117,12 +118,12 @@ public class DataDependenceGraph extends DependenceGraph {
 		}
 		
 		// consider field reads
-		Q interproceduralDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.InterproceduralDataFlow);
-		Q fields = Common.universe().nodesTaggedWithAny(XCSG.Field, XCSG.ArrayComponents);
-		Q parameters = Common.universe().nodesTaggedWithAny(XCSG.Parameter);
-		Q returns = Common.universe().nodesTaggedWithAny(XCSG.Return);
+		Q interproceduralDataFlowEdges = Query.universe().edges(XCSG.InterproceduralDataFlow);
+		Q fields = Query.universe().nodes(XCSG.Field, XCSG.ArrayComponents);
+		Q parameters = Query.universe().nodes(XCSG.Parameter);
+		Q returns = Query.universe().nodes(XCSG.Return);
 		Q localDFG = Common.toQ(dfg).difference(parameters, returns);
-		for(Node field : interproceduralDataFlowEdges.between(fields, localDFG).nodesTaggedWithAny(XCSG.Field).eval().nodes()){
+		for(Node field : interproceduralDataFlowEdges.between(fields, localDFG).nodes(XCSG.Field).eval().nodes()){
 			for(Node localDFNode : interproceduralDataFlowEdges.forward(Common.toQ(field)).intersection(localDFG).eval().nodes()){
 				Node toStatement = localDFNode;
 				if(!toStatement.taggedWith(XCSG.ReturnValue)){
@@ -134,7 +135,7 @@ public class DataDependenceGraph extends DependenceGraph {
 					continue;
 				}
 				
-				Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
@@ -146,8 +147,8 @@ public class DataDependenceGraph extends DependenceGraph {
 		}
 		
 		// add data dependencies for array references
-		Q arrayIdentityForEdges = Common.universe().edgesTaggedWithAny(XCSG.ArrayIdentityFor);
-		for(Node arrayRead : Common.toQ(dfg).nodesTaggedWithAny(XCSG.ArrayRead).eval().nodes()){
+		Q arrayIdentityForEdges = Query.universe().edges(XCSG.ArrayIdentityFor);
+		for(Node arrayRead : Common.toQ(dfg).nodes(XCSG.ArrayRead).eval().nodes()){
 			for(Node arrayIdentityFor : arrayIdentityForEdges.predecessors(Common.toQ(arrayRead)).eval().nodes()){
 				Node fromStatement = arrayIdentityFor;
 				if(!fromStatement.taggedWith(XCSG.Parameter) && !fromStatement.taggedWith(XCSG.Field)){
@@ -160,7 +161,7 @@ public class DataDependenceGraph extends DependenceGraph {
 					continue;
 				}
 				
-				Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
@@ -172,8 +173,8 @@ public class DataDependenceGraph extends DependenceGraph {
 		}
 		
 		// add data dependencies for array indexes
-		Q arrayIndexForEdges = Common.universe().edgesTaggedWithAny(XCSG.ArrayIndexFor);
-		for(Node arrayRead : Common.toQ(dfg).nodesTaggedWithAny(XCSG.ArrayRead).eval().nodes()){
+		Q arrayIndexForEdges = Query.universe().edges(XCSG.ArrayIndexFor);
+		for(Node arrayRead : Common.toQ(dfg).nodes(XCSG.ArrayRead).eval().nodes()){
 			for(Node arrayIndexFor : arrayIndexForEdges.predecessors(Common.toQ(arrayRead)).eval().nodes()){
 				Node fromStatement = arrayIndexFor;
 				if(!fromStatement.taggedWith(XCSG.Parameter) && !fromStatement.taggedWith(XCSG.Field)){
@@ -186,7 +187,7 @@ public class DataDependenceGraph extends DependenceGraph {
 					continue;
 				}
 				
-				Q dataDependenceEdges = Common.universe().edgesTaggedWithAny(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().getFirst();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);

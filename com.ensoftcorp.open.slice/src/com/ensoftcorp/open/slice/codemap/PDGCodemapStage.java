@@ -3,7 +3,7 @@ package com.ensoftcorp.open.slice.codemap;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.ensoftcorp.atlas.core.db.graph.Node;
-import com.ensoftcorp.atlas.core.script.Common;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.codemap.PrioritizedCodemapStage;
 import com.ensoftcorp.open.slice.analysis.DependenceGraph;
@@ -41,7 +41,7 @@ public class PDGCodemapStage extends PrioritizedCodemapStage {
 	public void performIndexing(IProgressMonitor monitor) {
 		if(SlicePreferences.isComputeProgramDependenceGraphsEnabled()){
 			Log.info("Computing Program Dependence Graphs...");
-			for(Node function : Common.universe().nodesTaggedWithAny(XCSG.Function).eval().nodes()){
+			for(Node function : Query.universe().nodes(XCSG.Function).eval().nodes()){
 				DependenceGraph.Factory.buildPDG(function);
 			}
 		}

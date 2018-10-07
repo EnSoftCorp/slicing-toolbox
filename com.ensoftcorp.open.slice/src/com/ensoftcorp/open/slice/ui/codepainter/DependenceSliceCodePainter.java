@@ -58,7 +58,7 @@ public abstract class DependenceSliceCodePainter extends CodePainter {
 
 	@Override
 	public UnstyledFrontierResult computeFrontierResult(Q filteredSelections, int reverse, int forward) {
-		Q selectedFunctions = filteredSelections.nodesTaggedWithAny(XCSG.Function);
+		Q selectedFunctions = filteredSelections.nodes(XCSG.Function);
 		
 		// remove any functions that are selected because callsites were selected
 		Q selectedStatements = Common.toQ(DependenceGraph.getStatements(filteredSelections.difference(selectedFunctions).eval().nodes()));

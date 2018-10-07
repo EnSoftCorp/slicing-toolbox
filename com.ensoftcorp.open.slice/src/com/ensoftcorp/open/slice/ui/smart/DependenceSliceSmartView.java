@@ -76,7 +76,7 @@ public abstract class DependenceSliceSmartView extends FilteringAtlasSmartViewSc
 	public FrontierStyledResult evaluate(IAtlasSelectionEvent event, int reverse, int forward) {
 		
 		Q filteredSelection = filter(event.getSelection());
-		Q functions = filteredSelection.nodesTaggedWithAny(XCSG.Function);
+		Q functions = filteredSelection.nodes(XCSG.Function);
 		AtlasSet<Node> criteria = DependenceGraph.getStatements(filteredSelection.difference(functions).eval().nodes());
 		
 		if(criteria.isEmpty() && functions.eval().nodes().isEmpty()){

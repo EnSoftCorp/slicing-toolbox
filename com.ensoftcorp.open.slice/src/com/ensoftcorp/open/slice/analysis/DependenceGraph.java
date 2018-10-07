@@ -4,6 +4,7 @@ import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 
@@ -74,8 +75,8 @@ public abstract class DependenceGraph {
 		}
 		
 		public static ControlDependenceGraph buildCDG(Node function, boolean purgeAugmentations){
-			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
+			Q controlFlowEdges = Query.universe().edges(XCSG.ControlFlow_Edge);
+			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodes(XCSG.controlFlowRoot));
 			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval(), purgeAugmentations);
 			return cdg;
 		}
@@ -86,8 +87,8 @@ public abstract class DependenceGraph {
 		 * @return
 		 */
 		public static DataDependenceGraph buildDDG(Node function){
-			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
-			Q localDFG = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(localDataFlowEdges);
+			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
+			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
 			Q dfg = Common.toQ(localDFG.eval());
 			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters, identity
 			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
@@ -101,12 +102,12 @@ public abstract class DependenceGraph {
 		 * @return
 		 */
 		public static ProgramDependenceGraph buildPDG(Node function){
-			Q controlFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge);
-			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodesTaggedWithAny(XCSG.controlFlowRoot));
+			Q controlFlowEdges = Query.universe().edges(XCSG.ControlFlow_Edge);
+			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodes(XCSG.controlFlowRoot));
 			
-			Q dataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.DataFlow_Edge);
-			Q localDataFlowEdges = Common.universe().edgesTaggedWithAny(XCSG.LocalDataFlow);
-			Q dfg = Common.toQ(function).contained().nodesTaggedWithAny(XCSG.DataFlow_Node).induce(dataFlowEdges);
+			Q dataFlowEdges = Query.universe().edges(XCSG.DataFlow_Edge);
+			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
+			Q dfg = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(dataFlowEdges);
 			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
 			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			
