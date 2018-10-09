@@ -2,7 +2,6 @@ package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
@@ -77,13 +76,13 @@ public class DataDependenceGraph extends DependenceGraph {
 		}
 		
 		for(Edge dfEdge : dfg.edges()){
-			Node from = dfEdge.getNode(EdgeDirection.FROM);
+			Node from = dfEdge.from();
 			Node fromStatement = from;
 			if(!fromStatement.taggedWith(XCSG.Identity) && !fromStatement.taggedWith(XCSG.Parameter)){
 				fromStatement = getStatement(from);
 			}
 			
-			Node to = dfEdge.getNode(EdgeDirection.TO);
+			Node to = dfEdge.to();
 			Node toStatement = to;
 			if(!toStatement.taggedWith(XCSG.ReturnValue)){
 				toStatement = getStatement(to);

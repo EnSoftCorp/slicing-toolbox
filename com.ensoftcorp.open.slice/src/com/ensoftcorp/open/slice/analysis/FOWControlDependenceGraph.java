@@ -2,7 +2,6 @@ package com.ensoftcorp.open.slice.analysis;
 
 import com.ensoftcorp.atlas.core.db.graph.Edge;
 import com.ensoftcorp.atlas.core.db.graph.Graph;
-import com.ensoftcorp.atlas.core.db.graph.GraphElement.EdgeDirection;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
@@ -135,8 +134,8 @@ public class FOWControlDependenceGraph extends DependenceGraph {
 		// (including LCA if LCA is X and excluding LCA if LCA is not X)
 		AtlasSet<Edge> controlDependenceEdgeSet = new AtlasHashSet<Edge>();
 		for(Edge cfEdge : augmentedCFG.edges()){
-			Node x = cfEdge.getNode(EdgeDirection.FROM);
-			Node y = cfEdge.getNode(EdgeDirection.TO);
+			Node x = cfEdge.from();
+			Node y = cfEdge.to();
 			
 			// least common ancestor in forward dominance tree
 			Node lca = CommonQueries.leastCommonAncestor(x, y, fdt);
