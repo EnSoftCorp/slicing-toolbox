@@ -71,13 +71,9 @@ public abstract class DependenceGraph {
 		 * @return
 		 */
 		public static ControlDependenceGraph buildCDG(Node function){
-			return buildCDG(function, true);
-		}
-		
-		public static ControlDependenceGraph buildCDG(Node function, boolean purgeAugmentations){
 			Q controlFlowEdges = Query.universe().edges(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodes(XCSG.controlFlowRoot));
-			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval(), purgeAugmentations);
+			ControlDependenceGraph cdg = new ControlDependenceGraph(cfg.eval());
 			return cdg;
 		}
 		
