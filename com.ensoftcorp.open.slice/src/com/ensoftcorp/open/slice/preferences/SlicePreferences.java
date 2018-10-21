@@ -8,8 +8,16 @@ import com.ensoftcorp.open.slice.log.Log;
 
 public class SlicePreferences extends AbstractPreferenceInitializer {
 
-private static boolean initialized = false;
-	
+	private static boolean initialized = false;
+		
+	/**
+	 * Returns the preference store used for these preferences
+	 * @return
+	 */
+	public static IPreferenceStore getPreferenceStore() {
+		return Activator.getDefault().getPreferenceStore();
+	}
+
 	/**
 	 * Enable/disable decompiled loop identification
 	 */

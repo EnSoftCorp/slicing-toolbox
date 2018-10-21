@@ -38,13 +38,15 @@ public class PDGCodemapStage extends PrioritizedCodemapStage {
 	}
 
 	@Override
-	public void performIndexing(IProgressMonitor monitor) {
-		if(SlicePreferences.isComputeProgramDependenceGraphsEnabled()){
+	public boolean performIndexing(IProgressMonitor monitor) {
+		boolean runIndexer = SlicePreferences.isComputeProgramDependenceGraphsEnabled();
+		if(runIndexer){
 			Log.info("Computing Program Dependence Graphs...");
 			for(Node function : Query.universe().nodes(XCSG.Function).eval().nodes()){
 				DependenceGraph.Factory.buildPDG(function);
 			}
 		}
+		return runIndexer;
 	}
 
 }

@@ -8,7 +8,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.ensoftcorp.open.slice.preferences.SlicePreferences;
-import com.ensoftcorp.open.slice.ui.Activator;
 
 /**
  * UI for setting slice preferences
@@ -27,7 +26,7 @@ public class SlicePreferencesPage extends FieldEditorPreferencePage implements I
 
 	@Override
 	public void init(IWorkbench workbench) {
-		IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
+		IPreferenceStore preferences = SlicePreferences.getPreferenceStore();
 		setPreferenceStore(preferences);
 		setDescription("Configure preferences for the Slicing Toolbox plugin.");
 		
