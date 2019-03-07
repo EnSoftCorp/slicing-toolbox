@@ -24,6 +24,11 @@ public class DataDependenceGraph extends DependenceGraph {
 	 */
 	public static final String JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE = "jimple-initialization-data-dependence";
 	
+	/**
+	 * Used to identify the dependent variable
+	 */
+	public static final String DEPENDENT_VARIABLE = "dependent-variable";
+	
 	private Graph dfg; // data flow graph (SSA form)
 	private Graph ddg; // data dependency graph
 	
@@ -112,6 +117,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
 				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
 				dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, from.getAttr(XCSG.name).toString());
 			}
 			dataDependenceEdgeSet.add(dataDependenceEdge);
 		}
