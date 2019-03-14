@@ -259,6 +259,27 @@ public class DataDependenceGraph extends DependenceGraph {
 					pointerDependenceEdgeSet.add(dataDependenceEdge);
 				}
 			}
+			
+			// if it is an ampersand node, then potentially we may have to process some backwards data flow
+			if(pointerFlow.taggedWith(XCSG.C.Provisional.Ampersand)) {
+				Q target = Query.universe().edges("addressOf").predecessors(Common.toQ(pointerFlow));
+				Q stackVariable = Query.universe().edges("identifier").successors(target);
+				Q possibleTargetDefinitions = Query.universe().edges("identifier").predecessors(stackVariable);
+				for(Node possibleTargetDefinition : possibleTargetDefinitions.eval().nodes()) {
+					Node fromStatement = CommonQueries.getContainingControlFlowNode(possibleTargetDefinition);
+					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
+					if(dataDependenceEdge == null){
+						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
+						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, stackVariable.eval().nodes().one().getAttr(XCSG.name).toString());
+					}
+					dataDependenceEdgeSet.add(dataDependenceEdge);
+					backwardDataDependenceEdgeSet.add(dataDependenceEdge);
+				}
+			}
 		}
 		
 		if(!pointerDependenceEdgeSet.isEmpty()) {
