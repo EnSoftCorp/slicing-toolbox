@@ -12,12 +12,28 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
 
+/**
+ * Compute Data Dependence Graph
+ * 
+ * @author Payas Awadhutkar, Ben Holland
+ */
+
 public class DataDependenceGraph extends DependenceGraph {
 
 	/**
 	 * Used to tag the edges between nodes that contain a data dependence
 	 */
 	public static final String DATA_DEPENDENCE_EDGE = "data-dependence";
+	
+	/**
+	 * Used to tag the edges between nodes that contain a data dependence due to a pointer
+	 */
+	public static final String POINTER_DEPENDENCE_EDGE = "pointer-dependence";
+	
+	/**
+	 * Used to tag the edges between nodes that contain a backwards data dependence
+	 */
+	public static final String BACKWARD_DATA_DEPENDENCE_EDGE = "backward-data-dependence";
 	
 	/**
 	 * Used to simulate the implict data dependency from initialization to instantiation
@@ -43,6 +59,8 @@ public class DataDependenceGraph extends DependenceGraph {
 		this.dfg = dfg;
 		
 		AtlasSet<Edge> dataDependenceEdgeSet = new AtlasHashSet<Edge>();
+		AtlasSet<Edge> pointerDependenceEdgeSet = new AtlasHashSet<Edge>();
+		AtlasSet<Edge> backwardDataDependenceEdgeSet = new AtlasHashSet<Edge>();
 		
 		if(!CommonQueries.isEmpty(Common.toQ(dfg).nodes(XCSG.Language.Jimple))) {
 			// this is sort of a logical patch for an oddity in jimple
@@ -203,9 +221,102 @@ public class DataDependenceGraph extends DependenceGraph {
 			}
 		}
 		
+		/**
+		 * Handle Pointers
+		 */
+		Q pointerFlows = Common.toQ(dfg).nodes(XCSG.C.Provisional.Star,XCSG.C.Provisional.Ampersand);
+		for(Node pointerFlow : pointerFlows.eval().nodes()) {
+			Node toStatement = CommonQueries.getContainingControlFlowNode(pointerFlow);
+			Q predecessors = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).predecessors(Common.toQ(pointerFlow));
+			Q edgesToProcess = Common.empty();
+			if(!CommonQueries.isEmpty(predecessors.nodes(XCSG.C.Provisional.Star))) {
+				// check if the current node is part of a double pointer dereference
+				// If so, ignore as it should be processed at the outermost dereferencing
+				continue;
+			} else {
+				edgesToProcess = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).reverseStep(Common.toQ(pointerFlow));
+				// Check if there is an incoming pointer. In which case, we should ignore the direct link from the dereferenced variable
+				Q pointers = getPointersContained(predecessors);
+				if(!CommonQueries.isEmpty(pointers)) {
+					edgesToProcess = edgesToProcess.forward(pointers);
+				}
+			}
+			// Q edgesToProcess = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).reverseStep(Common.toQ(pointerFlow));
+			for(Edge edgeToProcess : edgesToProcess.eval().edges()) {
+				Node dependentVariable = edgeToProcess.from();
+				if(dependentVariable.taggedWith(XCSG.Assignment)) {
+					Node fromStatement = CommonQueries.getContainingControlFlowNode(dependentVariable);
+					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
+					if(dataDependenceEdge == null){
+						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
+						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(POINTER_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariable.getAttr(XCSG.name).toString());
+					}
+					dataDependenceEdgeSet.add(dataDependenceEdge);
+					pointerDependenceEdgeSet.add(dataDependenceEdge);
+				}
+			}
+		}
+		
+		if(!pointerDependenceEdgeSet.isEmpty()) {
+			for(Edge pointerDependenceEdge : pointerDependenceEdgeSet) {
+				Node fromStatement = pointerDependenceEdge.from();
+				Node toStatement = pointerDependenceEdge.to();
+				String dependentVariableName = pointerDependenceEdge.getAttr(DEPENDENT_VARIABLE).toString().replace("=", "");
+				if(!toStatement.getAttr(XCSG.name).toString().contains(dependentVariableName)) {
+					// We need to redirect this edge. This is not the right data dependence edge
+					pointerDependenceEdge.untag(DATA_DEPENDENCE_EDGE);
+					dataDependenceEdgeSet.remove(pointerDependenceEdge);
+					AtlasSet<Node> redirectionTargets = getRedirectionTargets(toStatement, dependentVariableName);
+					for(Node redirectionTarget : redirectionTargets) {
+						Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+						Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(redirectionTarget)).eval().edges().one();
+						if(dataDependenceEdge == null){
+							dataDependenceEdge = Graph.U.createEdge(fromStatement, redirectionTarget);
+							dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariableName);
+						}
+						dataDependenceEdgeSet.add(dataDependenceEdge);
+						backwardDataDependenceEdgeSet.add(dataDependenceEdge);
+					}
+				}
+			}
+		}
+		
 		this.ddg = Common.toQ(dataDependenceEdgeSet).eval();
 	}
+	
+	public static Q getPointersContained(Q variables) {
+		Q pointers = Common.empty();
+		for(Node variable : variables.eval().nodes()) {
+			Node type = Query.universe().edges(XCSG.TypeOf).successors(Common.toQ(variable)).eval().nodes().one();
+			if(type.taggedWith(XCSG.Pointer)) {
+				pointers = pointers.union(Common.toQ(variable));
+			}
+		}
+		return pointers;
+	}
 
+	public AtlasSet<Node> getRedirectionTargets(Node statement, String variable) {
+		Log.info(statement.getAttr(XCSG.name) + " : " + variable);
+		AtlasSet<Node> redirectionTargets = new AtlasHashSet<Node>();
+		Q predecessors = Query.universe().edges(DATA_DEPENDENCE_EDGE).predecessors(Common.toQ(statement));		
+		for(Node predecessor : predecessors.eval().nodes()) {
+			if(predecessor.getAttr(XCSG.name).toString().contains(variable)) {
+				// this is a redirection candidate
+				Log.info(predecessor.getAttr(XCSG.name) + "");
+				redirectionTargets.add(predecessor);
+			}
+		}
+		
+		return redirectionTargets;
+	}
+	
 	@Override
 	public Q getGraph() {
 		return Common.toQ(ddg);
