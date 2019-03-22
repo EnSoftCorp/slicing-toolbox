@@ -86,8 +86,9 @@ public abstract class DependenceGraph {
 			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
 			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
 			Q dfg = Common.toQ(localDFG.eval());
-			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters, identity
-			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
+			// Next two lines are most likely unnecessary
+			// dfg = localDataFlowEdges.reverseStep(dfg); // get parameters, identity
+			// dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 			return ddg;
 		}
