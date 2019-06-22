@@ -143,7 +143,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
 				dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
 				dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, from.getAttr(XCSG.name).toString());
-				Log.info(fromStatement.getAttr(XCSG.name) + " -> " + toStatement.getAttr(XCSG.name));
+//				Log.info(fromStatement.getAttr(XCSG.name) + " -> " + toStatement.getAttr(XCSG.name));
 			}
 			dataDependenceEdgeSet.add(dataDependenceEdge);
 		}
@@ -405,13 +405,13 @@ public class DataDependenceGraph extends DependenceGraph {
 	}
 
 	public AtlasSet<Node> getRedirectionTargets(Node statement, String variable) {
-		Log.info(statement.getAttr(XCSG.name) + " : " + variable);
+//		Log.info(statement.getAttr(XCSG.name) + " : " + variable);
 		AtlasSet<Node> redirectionTargets = new AtlasHashSet<Node>();
 		Q predecessors = Query.universe().edges(DATA_DEPENDENCE_EDGE).predecessors(Common.toQ(statement));		
 		for(Node predecessor : predecessors.eval().nodes()) {
 			if(predecessor.getAttr(XCSG.name).toString().contains(variable)) {
 				// this is a redirection candidate
-				Log.info(predecessor.getAttr(XCSG.name) + "");
+//				Log.info(predecessor.getAttr(XCSG.name) + "");
 				redirectionTargets.add(predecessor);
 			}
 		}
