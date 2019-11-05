@@ -15,10 +15,10 @@ import com.ensoftcorp.open.slice.log.Log;
 /**
  * Compute Data Dependence Graph
  * 
- * @author Payas Awadhutkar, Ben Holland
+ * @author Payas Awadhutkar
  */
 
-public class DataDependenceGraph extends DependenceGraph {
+public class CDataDependenceGraph extends DependenceGraph {
 
 	/**
 	 * Used to tag the edges between nodes that contain a data dependence
@@ -55,7 +55,7 @@ public class DataDependenceGraph extends DependenceGraph {
 	private Graph dfg; // data flow graph (SSA form)
 	private Graph ddg; // data dependency graph
 
-	public DataDependenceGraph(Graph dfg){
+	public CDataDependenceGraph(Graph dfg){
 		// sanity checks
 		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
 			this.dfg = Common.toQ(dfg).eval();
@@ -228,6 +228,94 @@ public class DataDependenceGraph extends DependenceGraph {
 					dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
+			}
+		}
+
+		/**
+		 * Handle Pointers
+		 */
+		Q pointerFlows = Common.toQ(dfg).nodes(XCSG.C.Provisional.Star,XCSG.C.Provisional.Ampersand);
+		for(Node pointerFlow : pointerFlows.eval().nodes()) {
+			Node toStatement = CommonQueries.getContainingControlFlowNode(pointerFlow);
+			Q predecessors = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).predecessors(Common.toQ(pointerFlow));
+			Q edgesToProcess = Common.empty();
+			if(!CommonQueries.isEmpty(predecessors.nodes(XCSG.C.Provisional.Star))) {
+				// check if the current node is part of a double pointer dereference
+				// If so, ignore as it should be processed at the outermost dereferencing
+				continue;
+			} else {
+				edgesToProcess = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).reverseStep(Common.toQ(pointerFlow));
+				// Check if there is an incoming pointer. In which case, we should ignore the direct link from the dereferenced variable
+				Q pointers = getPointersContained(predecessors);
+				if(!CommonQueries.isEmpty(pointers)) {
+					edgesToProcess = edgesToProcess.forward(pointers);
+				}
+			}
+			// Q edgesToProcess = Query.universe().edges("pointerDereference","addressOf",XCSG.InterproceduralDataFlow).reverseStep(Common.toQ(pointerFlow));
+			for(Edge edgeToProcess : edgesToProcess.eval().edges()) {
+				Node dependentVariable = edgeToProcess.from();
+				if(dependentVariable.taggedWith(XCSG.Assignment)) {
+					Node fromStatement = CommonQueries.getContainingControlFlowNode(dependentVariable);
+					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
+					if(dataDependenceEdge == null){
+						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
+						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(POINTER_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariable.getAttr(XCSG.name).toString());
+					}
+					dataDependenceEdgeSet.add(dataDependenceEdge);
+					pointerDependenceEdgeSet.add(dataDependenceEdge);
+				}
+			}
+
+			// if it is an ampersand node, then potentially we may have to process some backwards data flow
+			if(pointerFlow.taggedWith(XCSG.C.Provisional.Ampersand)) {
+				Q target = Query.universe().edges("addressOf").predecessors(Common.toQ(pointerFlow));
+				Q stackVariable = Query.universe().edges("identifier").successors(target);
+				Q possibleTargetDefinitions = Query.universe().edges("identifier").predecessors(stackVariable);
+				for(Node possibleTargetDefinition : possibleTargetDefinitions.eval().nodes()) {
+					Node fromStatement = CommonQueries.getContainingControlFlowNode(possibleTargetDefinition);
+					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
+					if(dataDependenceEdge == null){
+						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
+						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, stackVariable.eval().nodes().one().getAttr(XCSG.name).toString());
+					}
+					dataDependenceEdgeSet.add(dataDependenceEdge);
+					backwardDataDependenceEdgeSet.add(dataDependenceEdge);
+				}
+			}
+		}
+
+		if(!pointerDependenceEdgeSet.isEmpty()) {
+			for(Edge pointerDependenceEdge : pointerDependenceEdgeSet) {
+				Node fromStatement = pointerDependenceEdge.from();
+				Node toStatement = pointerDependenceEdge.to();
+				String dependentVariableName = pointerDependenceEdge.getAttr(DEPENDENT_VARIABLE).toString().replace("=", "");
+				if(!toStatement.getAttr(XCSG.name).toString().contains(dependentVariableName)) {
+					// We need to redirect this edge. This is not the right data dependence edge
+					pointerDependenceEdge.untag(DATA_DEPENDENCE_EDGE);
+					dataDependenceEdgeSet.remove(pointerDependenceEdge);
+					AtlasSet<Node> redirectionTargets = getRedirectionTargets(toStatement, dependentVariableName);
+					for(Node redirectionTarget : redirectionTargets) {
+						Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+						Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(redirectionTarget)).eval().edges().one();
+						if(dataDependenceEdge == null){
+							dataDependenceEdge = Graph.U.createEdge(fromStatement, redirectionTarget);
+							dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariableName);
+						}
+						dataDependenceEdgeSet.add(dataDependenceEdge);
+						backwardDataDependenceEdgeSet.add(dataDependenceEdge);
+					}
+				}
 			}
 		}
 

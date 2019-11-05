@@ -86,9 +86,6 @@ public abstract class DependenceGraph {
 			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
 			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
 			Q dfg = Common.toQ(localDFG.eval());
-			// Next two lines are most likely unnecessary
-			// dfg = localDataFlowEdges.reverseStep(dfg); // get parameters, identity
-			// dfg = localDataFlowEdges.forwardStep(dfg); // get return values
 			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 			return ddg;
 		}
@@ -102,11 +99,9 @@ public abstract class DependenceGraph {
 			Q controlFlowEdges = Query.universe().edges(XCSG.ControlFlow_Edge);
 			Q cfg = controlFlowEdges.forward(Common.toQ(function).contained().nodes(XCSG.controlFlowRoot));
 			
-			Q dataFlowEdges = Query.universe().edges(XCSG.DataFlow_Edge);
 			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
-			Q dfg = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(dataFlowEdges);
-			dfg = localDataFlowEdges.reverseStep(dfg); // get parameters
-			dfg = localDataFlowEdges.forwardStep(dfg); // get return values
+			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
+			Q dfg = Common.toQ(localDFG.eval());
 			
 			ProgramDependenceGraph pdg = new ProgramDependenceGraph(cfg.eval(), dfg.eval());
 			return pdg;
