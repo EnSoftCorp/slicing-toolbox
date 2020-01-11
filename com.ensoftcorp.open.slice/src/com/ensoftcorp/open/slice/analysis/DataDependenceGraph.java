@@ -55,7 +55,7 @@ public class DataDependenceGraph extends DependenceGraph {
 	private Graph dfg; // data flow graph (SSA form)
 	private Graph ddg; // data dependency graph
 
-	public DataDependenceGraph(Graph dfg){
+	public DataDependenceGraph(Graph dfg) {
 		// sanity checks
 		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
 			this.dfg = Common.toQ(dfg).eval();
@@ -106,7 +106,7 @@ public class DataDependenceGraph extends DependenceGraph {
 			}
 		}
 
-		for(Edge dfEdge : dfg.edges()){
+		for(Edge dfEdge : dfg.edges()) {
 			Node from = dfEdge.from();
 			if(from.taggedWith(XCSG.Identity) || from.taggedWith(XCSG.Parameter)){
 				continue;
@@ -207,7 +207,7 @@ public class DataDependenceGraph extends DependenceGraph {
 
 		// add data dependencies for array indexes
 		Q arrayIndexForEdges = Query.universe().edges(XCSG.ArrayIndexFor);
-		for(Node arrayRead : Common.toQ(dfg).nodes(XCSG.ArrayRead).eval().nodes()){
+		for(Node arrayRead : Common.toQ(dfg).nodes(XCSG.ArrayRead).eval().nodes()) {
 			for(Node arrayIndexFor : arrayIndexForEdges.predecessors(Common.toQ(arrayRead)).eval().nodes()){
 				Node fromStatement = arrayIndexFor;
 				if(!fromStatement.taggedWith(XCSG.Parameter) && !fromStatement.taggedWith(XCSG.Field)){

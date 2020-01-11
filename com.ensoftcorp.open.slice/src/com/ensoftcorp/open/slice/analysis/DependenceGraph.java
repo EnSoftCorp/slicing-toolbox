@@ -8,6 +8,8 @@ import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
+
 public abstract class DependenceGraph {
 
 	public static enum SliceDirection {
@@ -82,12 +84,21 @@ public abstract class DependenceGraph {
 		 * @param function
 		 * @return
 		 */
-		public static DataDependenceGraph buildDDG(Node function){
-			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
-			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
-			Q dfg = Common.toQ(localDFG.eval());
-			DataDependenceGraph ddg = new DataDependenceGraph(dfg.eval());
-			return ddg;
+		public static DependenceGraph buildDDG(Node function){
+			
+			if(function.taggedWith(XCSG.Language.C)) {
+				Q dfg = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node);
+				DependenceGraph ddg = new CDataDependenceGraph(dfg.eval());
+				return ddg;
+			}
+			else {
+				Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
+				Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
+				Q dfg = Common.toQ(localDFG.eval());
+				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
+				return ddg;
+			}
+		
 		}
 		
 		/**
