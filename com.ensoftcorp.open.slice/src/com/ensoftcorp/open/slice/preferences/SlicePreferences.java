@@ -19,7 +19,7 @@ public class SlicePreferences extends AbstractPreferenceInitializer {
 	}
 
 	/**
-	 * Enable/disable decompiled loop identification
+	 * Enable/disable Program Dependence Graph Computation
 	 */
 	public static final String COMPUTE_PROGRAM_DEPENDENCE_GRAPHS = "COMPUTE_PROGRAM_DEPENDENCE_GRAPHS";
 	public static final Boolean COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DEFAULT = false;
