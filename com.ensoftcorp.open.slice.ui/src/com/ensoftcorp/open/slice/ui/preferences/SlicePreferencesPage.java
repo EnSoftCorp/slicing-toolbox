@@ -45,6 +45,7 @@ public class SlicePreferencesPage extends FieldEditorPreferencePage implements I
 	@Override
 	protected void createFieldEditors() {
 		addField(new BooleanFieldEditor(SlicePreferences.COMPUTE_PROGRAM_DEPENDENCE_GRAPHS, "&" + COMPUTE_PROGRAM_DEPENDENCE_GRAPHS_DESCRIPTION, getFieldEditorParent()));
+		addField(new BooleanFieldEditor(SlicePreferences.COMPUTE_DATA_DEPENDENCE_GRAPHS, "Compute data dependence graphs", BooleanFieldEditor.DEFAULT, getFieldEditorParent()));
 	}
 
 }
