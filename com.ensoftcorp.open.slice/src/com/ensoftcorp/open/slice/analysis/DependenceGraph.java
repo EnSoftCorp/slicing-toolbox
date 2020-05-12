@@ -88,7 +88,7 @@ public abstract class DependenceGraph {
 			
 			if(function.taggedWith(XCSG.Language.C)) {
 				Q dfg = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node);
-				DependenceGraph ddg = new CDataDependenceGraph(dfg.eval());
+				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 				return ddg;
 			}
 			else {
