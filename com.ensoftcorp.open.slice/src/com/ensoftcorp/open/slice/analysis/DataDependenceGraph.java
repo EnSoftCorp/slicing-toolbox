@@ -319,7 +319,8 @@ public class DataDependenceGraph extends DependenceGraph {
 
 		/**
 		 * Interprocedural Data Dependence
-		 * TODO: We need a better schema for this
+		 * TODO: Java has different categories of parameters.
+		 * Currently we don't handle the Identity Pass (passing of a 'this' object to the callsite)
 		 */
 
 		// Handle parameters and returns
@@ -345,7 +346,7 @@ public class DataDependenceGraph extends DependenceGraph {
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 				interDataDependenceEdgeSet.add(dataDependenceEdge);
 			}
-			AtlasSet<Node> parameterVariables = Common.toQ(callSite).predecessorsOn(passedToEdges).eval().nodes();
+			AtlasSet<Node> parameterVariables = Common.toQ(callSite).predecessorsOn(passedToEdges).nodes(XCSG.Parameter).eval().nodes();
 			for(Node parameterVariable : parameterVariables) {
 				Node fromStatement = CommonQueries.getContainingControlFlowNode(callSite);
 				Q targets = Common.toQ(parameterVariable).successorsOn(dataFlowEdges).successorsOn(dataFlowEdges);
