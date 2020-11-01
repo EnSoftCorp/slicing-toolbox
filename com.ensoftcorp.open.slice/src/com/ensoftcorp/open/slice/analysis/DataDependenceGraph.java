@@ -346,7 +346,13 @@ public class DataDependenceGraph extends DependenceGraph {
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 				interDataDependenceEdgeSet.add(dataDependenceEdge);
 			}
-			AtlasSet<Node> parameterVariables = Common.toQ(callSite).predecessorsOn(passedToEdges).nodes(XCSG.Parameter).eval().nodes();
+			AtlasSet<Node> parameterVariables = new AtlasHashSet<Node>();
+			if(!CommonQueries.isEmpty(Common.toQ(dfg).nodes(XCSG.Language.C))) {
+				 parameterVariables.addAll(Common.toQ(callSite).predecessorsOn(passedToEdges).eval().nodes());
+			} else {
+				parameterVariables.addAll(Common.toQ(callSite).predecessorsOn(passedToEdges).nodes(XCSG.Parameter).eval().nodes());
+			}
+			
 			for(Node parameterVariable : parameterVariables) {
 				Node fromStatement = CommonQueries.getContainingControlFlowNode(callSite);
 				Q targets = Common.toQ(parameterVariable).successorsOn(dataFlowEdges).successorsOn(dataFlowEdges);
