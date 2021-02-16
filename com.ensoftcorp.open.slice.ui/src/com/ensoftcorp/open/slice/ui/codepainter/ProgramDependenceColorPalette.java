@@ -13,7 +13,7 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.codepainter.ColorPalette;
 import com.ensoftcorp.open.slice.analysis.ControlDependenceGraph;
-import com.ensoftcorp.open.slice.analysis.DataDependenceGraph;
+import com.ensoftcorp.open.slice.analysis.DataDependenceGraph2;
 
 public class ProgramDependenceColorPalette extends ColorPalette {
 
@@ -31,7 +31,7 @@ public class ProgramDependenceColorPalette extends ColorPalette {
 		Q canvasStatements = Common.toQ(canvas).nodes(XCSG.ControlFlow_Node);
 		Q fullCanvasStatements = CommonQueries.cfg(CommonQueries.getContainingFunctions(canvasStatements)).nodes(XCSG.ControlFlow_Node);
 		Q controlDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(ControlDependenceGraph.CONTROL_DEPENDENCE_EDGE));
-		Q dataDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(DataDependenceGraph.DATA_DEPENDENCE_EDGE));
+		Q dataDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(DataDependenceGraph2.DATA_DEPENDENCE_EDGE));
 
 		// color the control dependence edges
 		for(Edge edge : controlDependenceEdges.eval().edges()){

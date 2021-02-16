@@ -49,11 +49,11 @@ public class JimpleDataDependenceGraph extends DependenceGraph {
 						// create a data dependency edge from the initialization statement to the instantiation statement
 						// if one does not already exist
 						if(!initializationStatement.equals(instantiationStatement)) {
-							if(CommonQueries.isEmpty(Query.universe().edges(DataDependenceGraph.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
+							if(CommonQueries.isEmpty(Query.universe().edges(DataDependenceGraph2.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
 								Edge dataDependenceEdge = Graph.U.createEdge(initializationStatement, instantiationStatement);
-								dataDependenceEdge.tag(DataDependenceGraph.DATA_DEPENDENCE_EDGE);
-								dataDependenceEdge.tag(DataDependenceGraph.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE);
-								dataDependenceEdge.putAttr(XCSG.name, DataDependenceGraph.DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.tag(DataDependenceGraph2.DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.tag(DataDependenceGraph2.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.putAttr(XCSG.name, DataDependenceGraph2.DATA_DEPENDENCE_EDGE);
 								dataDependenceEdgeSet.add(dataDependenceEdge);
 							}
 						}

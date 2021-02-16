@@ -50,7 +50,7 @@ public abstract class DependenceGraph {
 		AtlasSet<Node> statements = new AtlasHashSet<Node>();
 		for(Node criterion : criteria){
 			if(criterion.taggedWith(XCSG.DataFlow_Node)){
-				statements.add(DataDependenceGraph.getStatement(criterion));
+				statements.add(DataDependenceGraph2.getStatement(criterion));
 			} else if(criterion.taggedWith(XCSG.ControlFlow_Node)){
 				statements.add(criterion);
 			}
@@ -84,18 +84,19 @@ public abstract class DependenceGraph {
 		 * @param function
 		 * @return
 		 */
-		public static DependenceGraph buildDDG(Node function){
+		public static DependenceGraph buildDDG(Node function) {
+			
+			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
+			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
+			Q dfg = Common.toQ(localDFG.eval());
+			
 			
 			if(function.taggedWith(XCSG.Language.C)) {
-				Q dfg = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node);
 				DependenceGraph ddg = new CDataDependenceGraph(dfg.eval());
 				return ddg;
 			}
 			else {
-				Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
-				Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
-				Q dfg = Common.toQ(localDFG.eval());
-				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
+				DependenceGraph ddg = new DataDependenceGraph2(dfg.eval());
 				return ddg;
 			}
 		
