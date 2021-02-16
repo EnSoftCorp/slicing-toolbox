@@ -23,6 +23,7 @@ import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.index.common.SourceCorrespondence;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.query.Query;
+import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 
 public class SlicingResult {
@@ -100,7 +101,9 @@ public class SlicingResult {
 			sb.append(file.toString() + "\n");
 			List<Node> l = sortedStatements.get(file);
 			for(Node n: l) {
+				Node functionN = Common.toQ(n).containers().nodes(XCSG.Function).eval().nodes().one();
 				SourceCorrespondence sc = (SourceCorrespondence) n.getAttr(XCSG.sourceCorrespondence);
+				sb.append("Function: " + functionN.getAttr(XCSG.name) + " ");
 				sb.append("Line " + sc.startLine + ": ");
 				sb.append(n.getAttr(XCSG.name) + "\n");
 			}
