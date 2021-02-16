@@ -43,7 +43,11 @@ public class PDGCodemapStage extends PrioritizedCodemapStage {
 		if(runIndexer){
 			Log.info("Computing Program Dependence Graphs...");
 			for(Node function : Query.universe().nodes(XCSG.Function).eval().nodes()){
-				DependenceGraph.Factory.buildPDG(function);
+				try {
+					DependenceGraph.Factory.buildPDG(function);
+				} catch(NullPointerException e) {
+					
+				}
 			}
 		}
 		return runIndexer;

@@ -290,31 +290,35 @@ public class DataDependenceGraph extends DependenceGraph {
 			}
 		}
 
-		if(!pointerDependenceEdgeSet.isEmpty()) {
-			for(Edge pointerDependenceEdge : pointerDependenceEdgeSet) {
-				Node fromStatement = pointerDependenceEdge.from();
-				Node toStatement = pointerDependenceEdge.to();
-				String dependentVariableName = pointerDependenceEdge.getAttr(DEPENDENT_VARIABLE).toString().replace("=", "");
-				if(!toStatement.getAttr(XCSG.name).toString().contains(dependentVariableName)) {
-					// We need to redirect this edge. This is not the right data dependence edge
-					pointerDependenceEdge.untag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdgeSet.remove(pointerDependenceEdge);
-					AtlasSet<Node> redirectionTargets = getRedirectionTargets(toStatement, dependentVariableName);
-					for(Node redirectionTarget : redirectionTargets) {
-						Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
-						Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(redirectionTarget)).eval().edges().one();
-						if(dataDependenceEdge == null){
-							dataDependenceEdge = Graph.U.createEdge(fromStatement, redirectionTarget);
-							dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariableName);
+		try {
+			if(!pointerDependenceEdgeSet.isEmpty()) {
+				for(Edge pointerDependenceEdge : pointerDependenceEdgeSet) {
+					Node fromStatement = pointerDependenceEdge.from();
+					Node toStatement = pointerDependenceEdge.to();
+					String dependentVariableName = pointerDependenceEdge.getAttr(DEPENDENT_VARIABLE).toString().replace("=", "");
+					if(!toStatement.getAttr(XCSG.name).toString().contains(dependentVariableName)) {
+						// We need to redirect this edge. This is not the right data dependence edge
+						pointerDependenceEdge.untag(DATA_DEPENDENCE_EDGE);
+						dataDependenceEdgeSet.remove(pointerDependenceEdge);
+						AtlasSet<Node> redirectionTargets = getRedirectionTargets(toStatement, dependentVariableName);
+						for(Node redirectionTarget : redirectionTargets) {
+							Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+							Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(redirectionTarget)).eval().edges().one();
+							if(dataDependenceEdge == null){
+								dataDependenceEdge = Graph.U.createEdge(fromStatement, redirectionTarget);
+								dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariableName);
+							}
+							dataDependenceEdgeSet.add(dataDependenceEdge);
+							backwardDataDependenceEdgeSet.add(dataDependenceEdge);
 						}
-						dataDependenceEdgeSet.add(dataDependenceEdge);
-						backwardDataDependenceEdgeSet.add(dataDependenceEdge);
 					}
 				}
 			}
+		} catch (NullPointerException e) {
+			//ignore
 		}
 
 		/**
