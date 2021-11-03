@@ -16,5 +16,6 @@ Export-Package: com.ensoftcorp.open.slice.analysis;
    com.ensoftcorp.atlas.core.highlight,
    com.ensoftcorp.atlas.core.db.graph,
    com.ensoftcorp.atlas.core.markup",
- com.ensoftcorp.open.slice.preferences;uses:="org.eclipse.core.runtime.preferences"
+ com.ensoftcorp.open.slice.preferences;uses:="org.eclipse.core.runtime.preferences",
+ com.ensoftcorp.open.slice.xcsg
 Automatic-Module-Name: com.ensoftcorp.open.slice

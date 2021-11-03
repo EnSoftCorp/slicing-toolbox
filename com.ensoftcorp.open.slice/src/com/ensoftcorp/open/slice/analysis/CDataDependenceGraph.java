@@ -11,6 +11,7 @@ import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
+import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
 
 /**
  * Compute Data Dependence Graph
@@ -18,45 +19,14 @@ import com.ensoftcorp.open.slice.log.Log;
  * @author Payas Awadhutkar
  */
 
-public class CDataDependenceGraph extends DependenceGraph {
+public class CDataDependenceGraph extends DataDependenceGraph2 {
+	
+	public CDataDependenceGraph(Graph dfg) {
+		super(dfg);
+	}
 
-	/**
-	 * Used to tag the edges between nodes that contain a data dependence
-	 */
-	public static final String DATA_DEPENDENCE_EDGE = "data-dependence";
-
-	/**
-	 * Used to tag the edges between nodes that contain a data dependence due to a pointer
-	 */
-	public static final String POINTER_DEPENDENCE_EDGE = "pointer-dependence";
-
-	/**
-	 * Used to tag the edges between nodes that contain a backwards data dependence
-	 */
-	public static final String BACKWARD_DATA_DEPENDENCE_EDGE = "backward-data-dependence";
-
-	public static final String GLOBAL_DATA_DEPENDENCE_EDGE = "global-data-dependence";
-
-	/**
-	 * Used to tag the edges representing interprocedural data dependence
-	 */
-	public static final String INTERPROCEDURAL_DATA_DEPENDENCE_EDGE = "data-dependence (inter)";
-
-	/**
-	 * Used to simulate the implict data dependency from initialization to instantiation
-	 */
-	public static final String JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE = "jimple-initialization-data-dependence";
-
-	/**
-	 * Used to identify the dependent variable
-	 */
-	public static final String DEPENDENT_VARIABLE = "dependent-variable";
-
-	private Graph dfg; // data flow graph (SSA form)
-	private Graph ddg; // data dependency graph
-
-	public CDataDependenceGraph(Graph dfg){
-
+	public void create(Graph dfg){
+		super.create();
 		Graph dfgWithEdges = Common.toQ(dfg).induce(Query.universe().edges(XCSG.DataFlow_Edge)).eval();
 
 		// sanity checks
@@ -104,13 +74,13 @@ public class CDataDependenceGraph extends DependenceGraph {
 				continue;
 			}
 
-			Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+			Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 			if(dataDependenceEdge == null){
 				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, from.getAttr(XCSG.name).toString());
+				dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, from.getAttr(XCSG.name).toString());
 				Log.info(fromStatement.getAttr(XCSG.name) + " -> " + toStatement.getAttr(XCSG.name));
 			}
 			dataDependenceEdgeSet.add(dataDependenceEdge);
@@ -133,12 +103,12 @@ public class CDataDependenceGraph extends DependenceGraph {
 				if(fromStatement == null || toStatement == null || fromStatement.equals(toStatement)){
 					continue;
 				}
-				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 			}
@@ -159,12 +129,12 @@ public class CDataDependenceGraph extends DependenceGraph {
 					continue;
 				}
 
-				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 			}
@@ -185,12 +155,12 @@ public class CDataDependenceGraph extends DependenceGraph {
 					continue;
 				}
 
-				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 			}
@@ -221,14 +191,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 				Node dependentVariable = edgeToProcess.from();
 				if(dependentVariable.taggedWith(XCSG.Assignment)) {
 					Node fromStatement = CommonQueries.getContainingControlFlowNode(dependentVariable);
-					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 					if(dataDependenceEdge == null){
 						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.tag(POINTER_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariable.getAttr(XCSG.name).toString());
+						dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(AnalysisXCSG.POINTER_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, dependentVariable.getAttr(XCSG.name).toString());
 					}
 					dataDependenceEdgeSet.add(dataDependenceEdge);
 					pointerDependenceEdgeSet.add(dataDependenceEdge);
@@ -242,14 +212,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 				Q possibleTargetDefinitions = Query.universe().edges("identifier").predecessors(stackVariable);
 				for(Node possibleTargetDefinition : possibleTargetDefinitions.eval().nodes()) {
 					Node fromStatement = CommonQueries.getContainingControlFlowNode(possibleTargetDefinition);
-					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 					if(dataDependenceEdge == null){
 						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, stackVariable.eval().nodes().one().getAttr(XCSG.name).toString());
+						dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(AnalysisXCSG.BACKWARD_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, stackVariable.eval().nodes().one().getAttr(XCSG.name).toString());
 					}
 					dataDependenceEdgeSet.add(dataDependenceEdge);
 					backwardDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -261,21 +231,21 @@ public class CDataDependenceGraph extends DependenceGraph {
 			for(Edge pointerDependenceEdge : pointerDependenceEdgeSet) {
 				Node fromStatement = pointerDependenceEdge.from();
 				Node toStatement = pointerDependenceEdge.to();
-				String dependentVariableName = pointerDependenceEdge.getAttr(DEPENDENT_VARIABLE).toString().replace("=", "");
+				String dependentVariableName = pointerDependenceEdge.getAttr(AnalysisXCSG.DEPENDENT_VARIABLE).toString().replace("=", "");
 				if(!toStatement.getAttr(XCSG.name).toString().contains(dependentVariableName)) {
 					// We need to redirect this edge. This is not the right data dependence edge
-					pointerDependenceEdge.untag(DATA_DEPENDENCE_EDGE);
+					pointerDependenceEdge.untag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 					dataDependenceEdgeSet.remove(pointerDependenceEdge);
 					AtlasSet<Node> redirectionTargets = getRedirectionTargets(toStatement, dependentVariableName);
 					for(Node redirectionTarget : redirectionTargets) {
-						Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+						Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 						Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(redirectionTarget)).eval().edges().one();
 						if(dataDependenceEdge == null){
 							dataDependenceEdge = Graph.U.createEdge(fromStatement, redirectionTarget);
-							dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.tag(BACKWARD_DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-							dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, dependentVariableName);
+							dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.tag(AnalysisXCSG.BACKWARD_DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+							dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, dependentVariableName);
 						}
 						dataDependenceEdgeSet.add(dataDependenceEdge);
 						backwardDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -300,14 +270,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 				String returnVariableName = returnVariable.getAttr(XCSG.name).toString();
 				Node fromStatement = CommonQueries.getContainingControlFlowNode(returnVariable);
 				Node toStatement = CommonQueries.getContainingControlFlowNode(callSite);
-				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.tag(INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(XCSG.name, INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, returnVariableName);
+					dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.tag(AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, returnVariableName);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 				interDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -325,15 +295,15 @@ public class CDataDependenceGraph extends DependenceGraph {
 				}
 				for(Node target : targets.eval().nodes()) {
 					Node toStatement = CommonQueries.getContainingControlFlowNode(target);
-					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 					Q dataDependenceEdges2 = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement));
-					Edge dataDependenceEdge = dataDependenceEdges2.selectEdge(DEPENDENT_VARIABLE, parameterVariableName).eval().edges().one();
+					Edge dataDependenceEdge = dataDependenceEdges2.selectEdge(AnalysisXCSG.DEPENDENT_VARIABLE, parameterVariableName).eval().edges().one();
 					if(dataDependenceEdge == null){
 						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.tag(INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(XCSG.name, INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, parameterVariableName);
+						dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, parameterVariableName);
 					}
 					dataDependenceEdgeSet.add(dataDependenceEdge);
 					interDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -351,14 +321,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 			Q trueTargets = interproceduralDataFlowEdges.successors(returnValue);
 			for(Node trueTarget : trueTargets.eval().nodes()) {
 				Node toStatement = getStatement(trueTarget);
-				Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+				Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 				Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 				if(dataDependenceEdge == null){
 					dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-					dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.tag(INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(XCSG.name, INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-					dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, returnVariableName);
+					dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.tag(AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+					dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, returnVariableName);
 				}
 				dataDependenceEdgeSet.add(dataDependenceEdge);
 				interDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -375,14 +345,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 				for(Node definition : definitions.eval().nodes()) {
 					Node fromStatement = CommonQueries.getContainingControlFlowNode(definition);
 					Node toStatement = CommonQueries.getContainingControlFlowNode(globalVariableUse);
-					Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+					Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 					Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 					if(dataDependenceEdge == null){
 						dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-						dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.tag(GLOBAL_DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(XCSG.name, GLOBAL_DATA_DEPENDENCE_EDGE);
-						dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, globalVariableName);
+						dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.tag(AnalysisXCSG.GLOBAL_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.GLOBAL_DATA_DEPENDENCE_EDGE);
+						dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, globalVariableName);
 					}
 					dataDependenceEdgeSet.add(dataDependenceEdge);
 				}
@@ -395,14 +365,14 @@ public class CDataDependenceGraph extends DependenceGraph {
 			Q instanceVariableAssignmentQ = Common.toQ(instanceVariableAssignment);
 			Node use = instanceVariableAssignmentQ.predecessorsOn(Common.edges(XCSG.LocalDataFlow)).eval().nodes().one();
 			Node instance = instanceVariableAssignmentQ.successorsOn(Common.edges(XCSG.InterproceduralDataFlow)).eval().nodes().one();
-			Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+			Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(instanceVariableAssignment).parent(), Common.toQ(instance)).eval().edges().one();
 			if(dataDependenceEdge == null){
 				dataDependenceEdge = Graph.U.createEdge(instanceVariableAssignmentQ.parent().eval().nodes().one(), instance);
-				dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.tag(INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, use.getAttr(XCSG.name).toString());
+				dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.tag(AnalysisXCSG.INTERPROCEDURAL_DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+				dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, use.getAttr(XCSG.name).toString());
 			}
 			dataDependenceEdgeSet.add(dataDependenceEdge);
 			interDataDependenceEdgeSet.add(dataDependenceEdge);
@@ -425,7 +395,7 @@ public class CDataDependenceGraph extends DependenceGraph {
 	public AtlasSet<Node> getRedirectionTargets(Node statement, String variable) {
 		Log.info(statement.getAttr(XCSG.name) + " : " + variable);
 		AtlasSet<Node> redirectionTargets = new AtlasHashSet<Node>();
-		Q predecessors = Query.universe().edges(DATA_DEPENDENCE_EDGE).predecessors(Common.toQ(statement));		
+		Q predecessors = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE).predecessors(Common.toQ(statement));		
 		for(Node predecessor : predecessors.eval().nodes()) {
 			if(predecessor.getAttr(XCSG.name).toString().contains(variable)) {
 				// this is a redirection candidate

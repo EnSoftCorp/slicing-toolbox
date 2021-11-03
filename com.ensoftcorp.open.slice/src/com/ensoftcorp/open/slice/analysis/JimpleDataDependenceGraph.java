@@ -10,24 +10,19 @@ import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
+import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
 
-public class JimpleDataDependenceGraph extends DependenceGraph {
-
-	private Graph dfg; // data flow graph (SSA form)
-	private Graph ddg; // data dependency graph
+public class JimpleDataDependenceGraph extends DataDependenceGraph2 {
 
 	public JimpleDataDependenceGraph(Graph dfg) {
-		// sanity checks
-		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
-			this.dfg = Common.toQ(dfg).eval();
-			this.ddg = Common.empty().eval();
-			return;
-		}
+		super(dfg);
+	}
 
-		this.dfg = dfg;
-		
+	public void create() {
+		super.create();
+
 		AtlasSet<Edge> dataDependenceEdgeSet = new AtlasHashSet<Edge>();
-		
+
 		// this is sort of a logical patch for an oddity in jimple
 		// 1. $r0 = new java.io.FileInputStream;
 		// 2. $r3 = args[0];
@@ -49,11 +44,11 @@ public class JimpleDataDependenceGraph extends DependenceGraph {
 						// create a data dependency edge from the initialization statement to the instantiation statement
 						// if one does not already exist
 						if(!initializationStatement.equals(instantiationStatement)) {
-							if(CommonQueries.isEmpty(Query.universe().edges(DataDependenceGraph2.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
+							if(CommonQueries.isEmpty(Query.universe().edges(AnalysisXCSG.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE).between(Common.toQ(initializationStatement), Common.toQ(instantiationStatement)))) {
 								Edge dataDependenceEdge = Graph.U.createEdge(initializationStatement, instantiationStatement);
-								dataDependenceEdge.tag(DataDependenceGraph2.DATA_DEPENDENCE_EDGE);
-								dataDependenceEdge.tag(DataDependenceGraph2.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE);
-								dataDependenceEdge.putAttr(XCSG.name, DataDependenceGraph2.DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.tag(AnalysisXCSG.JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE);
+								dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 								dataDependenceEdgeSet.add(dataDependenceEdge);
 							}
 						}
@@ -61,7 +56,7 @@ public class JimpleDataDependenceGraph extends DependenceGraph {
 				}
 			}
 		}
-		
+
 		this.ddg = Common.toQ(dataDependenceEdgeSet).eval();
 	}
 

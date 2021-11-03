@@ -8,8 +8,6 @@ import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 
-import com.ensoftcorp.open.commons.analysis.CommonQueries;
-
 public abstract class DependenceGraph {
 
 	public static enum SliceDirection {

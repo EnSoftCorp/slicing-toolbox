@@ -11,6 +11,7 @@ import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.log.Log;
+import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
 
 /**
  * Compute Data Dependence Graph
@@ -19,38 +20,6 @@ import com.ensoftcorp.open.slice.log.Log;
  */
 
 public class DataDependenceGraph2 extends DependenceGraph {
-
-	/**
-	 * Used to tag the edges between nodes that contain a data dependence
-	 */
-	public static final String DATA_DEPENDENCE_EDGE = "data-dependence";
-
-	/**
-	 * Used to tag the edges between nodes that contain a data dependence due to a pointer
-	 */
-	public static final String POINTER_DEPENDENCE_EDGE = "pointer-dependence";
-
-	/**
-	 * Used to tag the edges between nodes that contain a backwards data dependence
-	 */
-	public static final String BACKWARD_DATA_DEPENDENCE_EDGE = "backward-data-dependence";
-
-	public static final String GLOBAL_DATA_DEPENDENCE_EDGE = "global-data-dependence";
-
-	/**
-	 * Used to tag the edges representing interprocedural data dependence
-	 */
-	public static final String INTERPROCEDURAL_DATA_DEPENDENCE_EDGE = "data-dependence (inter)";
-
-	/**
-	 * Used to simulate the implict data dependency from initialization to instantiation
-	 */
-	public static final String JIMPLE_INITIALIZATION_DATA_DEPENDENCE_EDGE = "jimple-initialization-data-dependence";
-
-	/**
-	 * Used to identify the dependent variable
-	 */
-	public static final String DEPENDENT_VARIABLE = "dependent-variable";
 
 	protected Graph dfg; // data flow graph (SSA form)
 	protected Graph ddg; // data dependency graph
@@ -64,7 +33,7 @@ public class DataDependenceGraph2 extends DependenceGraph {
 	}
 
 	public void create() {
-		
+
 		for(Edge dfEdge: dfg.edges()) {
 			Node from = dfEdge.from();
 			Node fromStatement = CommonQueries.getContainingControlFlowNode(from);
@@ -92,15 +61,15 @@ public class DataDependenceGraph2 extends DependenceGraph {
 		}
 
 	}
-	
+
 	protected Edge createDataDependenceEdge(Node fromStatement, Node toStatement, String variableName) {
-		Q dataDependenceEdges = Query.universe().edges(DATA_DEPENDENCE_EDGE);
+		Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
 		Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 		if(dataDependenceEdge == null){
 			dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-			dataDependenceEdge.tag(DATA_DEPENDENCE_EDGE);
-			dataDependenceEdge.putAttr(XCSG.name, DATA_DEPENDENCE_EDGE);
-			dataDependenceEdge.putAttr(DEPENDENT_VARIABLE, variableName);
+			dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+			dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
+			dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, variableName);
 			Log.info(fromStatement.getAttr(XCSG.name) + " -> " + toStatement.getAttr(XCSG.name));
 		}
 		return dataDependenceEdge;
