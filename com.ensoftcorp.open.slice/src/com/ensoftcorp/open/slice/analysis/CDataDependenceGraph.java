@@ -19,73 +19,18 @@ import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
  * @author Payas Awadhutkar
  */
 
-public class CDataDependenceGraph extends DataDependenceGraph2 {
+public class CDataDependenceGraph extends DataDependenceGraph {
 	
 	public CDataDependenceGraph(Graph dfg) {
 		super(dfg);
 	}
 
-	public void create(Graph dfg){
+	@Override
+	public void create(){
 		super.create();
-		Graph dfgWithEdges = Common.toQ(dfg).induce(Query.universe().edges(XCSG.DataFlow_Edge)).eval();
-
-		// sanity checks
-		if(dfgWithEdges.nodes().isEmpty() || dfgWithEdges.edges().isEmpty()){
-			this.dfg = Common.toQ(dfgWithEdges).eval();
-			this.ddg = Common.empty().eval();
-			return;
-		}
-
-		this.dfg = dfgWithEdges;
-
-		AtlasSet<Edge> dataDependenceEdgeSet = new AtlasHashSet<Edge>();
 		AtlasSet<Edge> pointerDependenceEdgeSet = new AtlasHashSet<Edge>();
 		AtlasSet<Edge> backwardDataDependenceEdgeSet = new AtlasHashSet<Edge>();
-		AtlasSet<Edge> interDataDependenceEdgeSet = new AtlasHashSet<Edge>();
-
-		for(Edge dfEdge : dfgWithEdges.edges()){
-			Node from = dfEdge.from();
-			if(from.taggedWith(XCSG.Identity) || from.taggedWith(XCSG.Parameter)){
-				continue;
-			}
-			Node fromStatement = CommonQueries.getContainingControlFlowNode(from);
-
-			Node to = dfEdge.to();
-			if(to.taggedWith(XCSG.ReturnValue)){
-				continue;
-			}
-			Node toStatement = CommonQueries.getContainingControlFlowNode(to);
-
-			// sanity checks
-			if(fromStatement == null){
-				Log.warning("From node has no parent or is null: " + from.address().toAddressString());
-				continue;
-			}
-			if(toStatement == null){
-				Log.warning("To node has no parent or is null: " + to.address().toAddressString());
-				continue;
-			}
-
-			// statement contains both data flow nodes
-			// this is a little noisy to create relationships to all the time
-			// example: "x = 1;" is a single statement with a data dependence from 1 to x
-			// skip the trivial edges
-			if(fromStatement.equals(toStatement)){
-				continue;
-			}
-
-			Q dataDependenceEdges = Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
-			Edge dataDependenceEdge = dataDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
-			if(dataDependenceEdge == null){
-				dataDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-				dataDependenceEdge.tag(AnalysisXCSG.DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.DATA_DEPENDENCE_EDGE);
-				dataDependenceEdge.putAttr(AnalysisXCSG.DEPENDENT_VARIABLE, from.getAttr(XCSG.name).toString());
-				Log.info(fromStatement.getAttr(XCSG.name) + " -> " + toStatement.getAttr(XCSG.name));
-			}
-			dataDependenceEdgeSet.add(dataDependenceEdge);
-		}
-
+		
 		// consider field reads
 		Q interproceduralDataFlowEdges = Query.universe().edges(XCSG.InterproceduralDataFlow);
 		Q fields = Query.universe().nodes(XCSG.Field, XCSG.ArrayComponents);
@@ -406,18 +351,4 @@ public class CDataDependenceGraph extends DataDependenceGraph2 {
 
 		return redirectionTargets;
 	}
-
-	@Override
-	public Q getGraph() {
-		return Common.toQ(ddg);
-	}
-
-	/**
-	 * Returns the underlying data flow graph
-	 * @return
-	 */
-	public Q getDataFlowGraph(){
-		return Common.toQ(dfg);
-	}
-
 }

@@ -48,7 +48,7 @@ public abstract class DependenceGraph {
 		AtlasSet<Node> statements = new AtlasHashSet<Node>();
 		for(Node criterion : criteria){
 			if(criterion.taggedWith(XCSG.DataFlow_Node)){
-				statements.add(DataDependenceGraph2.getStatement(criterion));
+				statements.add(DataDependenceGraph.getStatement(criterion));
 			} else if(criterion.taggedWith(XCSG.ControlFlow_Node)){
 				statements.add(criterion);
 			}
@@ -94,7 +94,7 @@ public abstract class DependenceGraph {
 				return ddg;
 			}
 			else {
-				DependenceGraph ddg = new DataDependenceGraph2(dfg.eval());
+				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
 				return ddg;
 			}
 		

@@ -7,7 +7,7 @@ import com.ensoftcorp.atlas.core.script.Common;
 public class ProgramDependenceGraph extends DependenceGraph {
 
 	private ControlDependenceGraph cdg;
-	private DataDependenceGraph2 ddg;
+	private DataDependenceGraph ddg;
 	private Graph pdg;
 	
 	public ProgramDependenceGraph(Graph cfg, Graph dfg){
@@ -22,7 +22,7 @@ public class ProgramDependenceGraph extends DependenceGraph {
 		}
 		
 		this.cdg = new ControlDependenceGraph(cfg);
-		this.ddg = new DataDependenceGraph2(dfg);
+		this.ddg = new DataDependenceGraph(dfg);
 		this.pdg = cdg.getGraph().union(ddg.getGraph()).eval();
 	}
 	

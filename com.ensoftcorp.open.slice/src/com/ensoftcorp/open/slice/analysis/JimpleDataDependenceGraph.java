@@ -12,7 +12,7 @@ import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
 
-public class JimpleDataDependenceGraph extends DataDependenceGraph2 {
+public class JimpleDataDependenceGraph extends DataDependenceGraph {
 
 	public JimpleDataDependenceGraph(Graph dfg) {
 		super(dfg);
@@ -58,11 +58,6 @@ public class JimpleDataDependenceGraph extends DataDependenceGraph2 {
 		}
 
 		this.ddg = Common.toQ(dataDependenceEdgeSet).eval();
-	}
-
-	@Override
-	public Q getGraph() {
-		return Common.toQ(ddg);
 	}
 
 }
