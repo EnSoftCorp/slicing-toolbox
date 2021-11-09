@@ -10,9 +10,13 @@ import com.ensoftcorp.open.commons.analysis.CommonQueries;
 
 public class SystemDependenceGraph extends DependenceGraph {
 	
-	private static Graph sdg = null;
+	private Graph sdg;
 	
 	public SystemDependenceGraph(){
+		this.sdg = Common.empty().eval();
+	}
+	
+	public void create() {
 		if(sdg == null){
 			sdg = Common.empty().eval();
 			for(Node function : Query.universe().nodes(XCSG.Function).eval().nodes()){

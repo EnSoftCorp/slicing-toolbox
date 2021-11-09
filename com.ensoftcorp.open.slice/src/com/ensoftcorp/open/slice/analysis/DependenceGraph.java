@@ -19,6 +19,8 @@ public abstract class DependenceGraph {
 		}
 	}
 	
+	public abstract void create();
+	
 	public abstract Q getGraph();
 	
 	public Q getSlice(SliceDirection direction, AtlasSet<Node> criteria) {
@@ -87,20 +89,18 @@ public abstract class DependenceGraph {
 			Q localDataFlowEdges = Query.universe().edges(XCSG.LocalDataFlow);
 			Q localDFG = Common.toQ(function).contained().nodes(XCSG.DataFlow_Node).induce(localDataFlowEdges);
 			Q dfg = Common.toQ(localDFG.eval());
-			
+			DependenceGraph ddg;
 			
 			if(function.taggedWith(XCSG.Language.C)) {
-				DependenceGraph ddg = new CDataDependenceGraph(dfg.eval());
-				return ddg;
+				ddg = new CDataDependenceGraph(dfg.eval());
 			} else if(function.taggedWith(XCSG.Language.Java)) {
-				DependenceGraph ddg = new JavaDataDependenceGraph(dfg.eval());
-				return ddg;
+				ddg = new JavaDataDependenceGraph(dfg.eval());
 			}
 			else {
-				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
-				return ddg;
+				ddg = new DataDependenceGraph(dfg.eval());
 			}
-		
+			ddg.create();
+			return ddg;
 		}
 		
 		/**

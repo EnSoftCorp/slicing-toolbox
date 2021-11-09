@@ -14,6 +14,7 @@ import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitControlFlowGraph;
 import com.ensoftcorp.open.commons.algorithms.UniqueEntryExitGraph;
 import com.ensoftcorp.open.commons.preferences.CommonsPreferences;
 import com.ensoftcorp.open.slice.log.Log;
+import com.ensoftcorp.open.slice.xcsg.AnalysisXCSG;
 
 /**
  * Constructs the Control Dependence Graph (CGD) from a given Control Flow Graph (CFG)
@@ -30,22 +31,20 @@ import com.ensoftcorp.open.slice.log.Log;
  */
 public class ControlDependenceGraph extends DependenceGraph {
 
-	/**
-	 * Used to tag the edges between nodes that contain a control dependence
-	 */
-	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
-
 	private Graph cfg;
 	private Graph cdg;
-	
+
 	public ControlDependenceGraph(Graph cfg){
+		this.cfg = cfg;
+		this.cdg = Common.empty().eval();
+	}
+
+	public void create() {
 		// sanity checks
 		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
-			this.cdg = Common.toQ(cfg).eval();
-			this.cfg = Common.toQ(cfg).eval();
 			return;
 		}
-		
+
 		// compute dominance on-demand if needed
 		if(!CommonsPreferences.isComputeControlFlowGraphDominanceEnabled()) {
 			AtlasSet<Node> roots = Common.toQ(cfg).nodes(XCSG.controlFlowRoot).eval().nodes();
@@ -61,16 +60,16 @@ public class ControlDependenceGraph extends DependenceGraph {
 				}
 			}
 		}
-		
+
 		AtlasSet<Edge> controlDependenceEdgeSet = new AtlasHashSet<Edge>();
 		AtlasSet<Edge> dominanceFrontierEdges = DominanceAnalysis.getPostDominanceFrontierEdges().eval().edges();
-		
+
 		// for each edge in the dominance frontier edges (x --pdomf--> y)
 		// find or create a control dependence edge from the successor to the predecessor (y --control-dependence--> x)
 		for(Edge dominanceFrontierEdge : dominanceFrontierEdges) {
 			controlDependenceEdgeSet.add(findOrCreateControlDependenceEdge(dominanceFrontierEdge.to(), dominanceFrontierEdge.from()));
 		}
-		
+
 		this.cdg = Common.toQ(controlDependenceEdgeSet).eval();
 	}
 
@@ -81,22 +80,22 @@ public class ControlDependenceGraph extends DependenceGraph {
 	 * @param toStatement
 	 */
 	private Edge findOrCreateControlDependenceEdge(Node fromStatement, Node toStatement) {
-		Q controlDependenceEdges = Query.universe().edges(CONTROL_DEPENDENCE_EDGE);
+		Q controlDependenceEdges = Query.universe().edges(AnalysisXCSG.CONTROL_DEPENDENCE_EDGE);
 		Edge controlDependenceEdge = controlDependenceEdges.betweenStep(Common.toQ(fromStatement), Common.toQ(toStatement)).eval().edges().one();
 		if(controlDependenceEdge == null){
 			controlDependenceEdge = Graph.U.createEdge(fromStatement, toStatement);
-			controlDependenceEdge.tag(CONTROL_DEPENDENCE_EDGE);
-			controlDependenceEdge.putAttr(XCSG.name, CONTROL_DEPENDENCE_EDGE);
+			controlDependenceEdge.tag(AnalysisXCSG.CONTROL_DEPENDENCE_EDGE);
+			controlDependenceEdge.putAttr(XCSG.name, AnalysisXCSG.CONTROL_DEPENDENCE_EDGE);
 		}
 		return controlDependenceEdge;
 	}
-	
+
 	public Q getControlFlowGraph(){
 		return Common.toQ(cfg);
 	}
-	
+
 	public Q getGraph(){
 		return Common.toQ(cdg);
 	}
-	
+
 }

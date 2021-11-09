@@ -11,19 +11,26 @@ public class ProgramDependenceGraph extends DependenceGraph {
 	private Graph pdg;
 	
 	public ProgramDependenceGraph(Graph cfg, Graph dfg){
-		// sanity checks
-		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
-			pdg = Common.empty().eval();
-			return;
-		}
-		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
-			pdg = Common.empty().eval();
-			return;
-		}
+//		// sanity checks
+//		if(cfg.nodes().isEmpty() || cfg.edges().isEmpty()){
+//			pdg = Common.empty().eval();
+//			return;
+//		}
+//		if(dfg.nodes().isEmpty() || dfg.edges().isEmpty()){
+//			pdg = Common.empty().eval();
+//			return;
+//		}
 		
 		this.cdg = new ControlDependenceGraph(cfg);
 		this.ddg = new DataDependenceGraph(dfg);
-		this.pdg = cdg.getGraph().union(ddg.getGraph()).eval();
+		this.pdg = Common.empty().eval();
+	}
+		
+		
+	public void create() {
+		cdg.create();
+		ddg.create();
+		pdg = cdg.getGraph().union(ddg.getGraph()).eval();
 	}
 	
 	@Override

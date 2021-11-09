@@ -5,6 +5,18 @@ import com.ensoftcorp.open.commons.xcsg.XCSG_Extension;
 public interface AnalysisXCSG {
 	
 	/**
+	 * Used to tag the edges between nodes that contain a control dependence
+	 */
+	public static final String CONTROL_DEPENDENCE_EDGE = "control-dependence";
+
+	public static final String AUGMENTED_CFG_ENTRY = "cfg-entry";
+	public static final String AUGMENTED_CFG_EXIT = "cfg-exit";
+	
+	public static final String AUGMENTATION_NAME = "augmentation";
+	public static final String AUGMENTATION_NODE = "augmentation-node";
+	public static final String AUGMENTATION_EDGE = "augmentation-edge";
+	
+	/**
 	 * Used to tag the edges between nodes that contain a data dependence
 	 */
 	@XCSG_Extension

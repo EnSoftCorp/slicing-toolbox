@@ -30,7 +30,7 @@ public class ProgramDependenceColorPalette extends ColorPalette {
 		// expand to the full function of any statements on the canvas
 		Q canvasStatements = Common.toQ(canvas).nodes(XCSG.ControlFlow_Node);
 		Q fullCanvasStatements = CommonQueries.cfg(CommonQueries.getContainingFunctions(canvasStatements)).nodes(XCSG.ControlFlow_Node);
-		Q controlDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(ControlDependenceGraph.CONTROL_DEPENDENCE_EDGE));
+		Q controlDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(AnalysisXCSG.CONTROL_DEPENDENCE_EDGE));
 		Q dataDependenceEdges = fullCanvasStatements.induce(Query.universe().edges(AnalysisXCSG.DATA_DEPENDENCE_EDGE));
 
 		// color the control dependence edges
