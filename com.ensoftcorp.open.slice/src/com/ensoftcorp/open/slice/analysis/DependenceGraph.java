@@ -92,6 +92,9 @@ public abstract class DependenceGraph {
 			if(function.taggedWith(XCSG.Language.C)) {
 				DependenceGraph ddg = new CDataDependenceGraph(dfg.eval());
 				return ddg;
+			} else if(function.taggedWith(XCSG.Language.Java)) {
+				DependenceGraph ddg = new JavaDataDependenceGraph(dfg.eval());
+				return ddg;
 			}
 			else {
 				DependenceGraph ddg = new DataDependenceGraph(dfg.eval());
