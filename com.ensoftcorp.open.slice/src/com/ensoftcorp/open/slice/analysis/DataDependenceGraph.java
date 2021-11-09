@@ -106,5 +106,4 @@ public class DataDependenceGraph extends DependenceGraph {
 	protected Q getDataFlowGraph(){
 		return Common.toQ(dfg);
 	}
-
 }
