@@ -2,7 +2,7 @@
 <feature
       id="com.ensoftcorp.open.slice.feature"
       label="Slicing Toolbox"
-      version="3.7.0.qualifier"
+      version="4.2.2.qualifier"
       provider-name="Ensoft Corp.">
 
    <description url="https://ensoftcorp.github.io/slicing-toolbox">
@@ -10,13 +10,13 @@
    </description>
 
    <copyright url="https://ensoftcorp.github.io/slicing-toolbox/">
-      Copyright (c) 2016, 2021 EnSoft Corp.
+      Copyright (c) 2016, 2022 EnSoft Corp.
    </copyright>
 
    <license url="https://raw.githubusercontent.com/EnSoftCorp/slicing-toolbox/master/LICENSE">
       MIT License (MIT)
 
-Copyright (c) 2016, 2021 EnSoft Corp.
+Copyright (c) 2016, 2022 EnSoft Corp.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &amp;quot;Software&amp;quot;), to deal
@@ -39,10 +39,10 @@ SOFTWARE.
 
    <requires>
       <import plugin="com.ensoftcorp.atlas.ui"/>
-      <import feature="com.ensoftcorp.open.commons.feature" version="3.7.0.qualifier"/>
-      <import plugin="com.ensoftcorp.open.commons" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.commons.ui" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.slice" version="3.7.0" match="greaterOrEqual"/>
+      <import feature="com.ensoftcorp.open.commons.feature" version="4.2.2.qualifier"/>
+      <import plugin="com.ensoftcorp.open.commons" version="4.2.2" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.commons.ui" version="4.2.2" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.slice" version="4.2.2" match="greaterOrEqual"/>
    </requires>
 
    <plugin
