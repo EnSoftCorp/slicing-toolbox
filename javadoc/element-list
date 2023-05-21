@@ -3,9 +3,4 @@ com.ensoftcorp.open.slice.analysis
 com.ensoftcorp.open.slice.codemap
 com.ensoftcorp.open.slice.log
 com.ensoftcorp.open.slice.preferences
-com.ensoftcorp.open.slice.ui
-com.ensoftcorp.open.slice.ui.codepainter
-com.ensoftcorp.open.slice.ui.log
-com.ensoftcorp.open.slice.ui.preferences
-com.ensoftcorp.open.slice.ui.smart
 com.ensoftcorp.open.slice.util
