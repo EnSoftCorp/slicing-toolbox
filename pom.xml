@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.ensoftcorp.open</groupId>
     <artifactId>atlas-toolboxes</artifactId>
-    <version>4.2.3-SNAPSHOT</version>
+    <version>4.2.4-SNAPSHOT</version>
   </parent>
    
   <groupId>com.ensoftcorp.open</groupId>
   <artifactId>slicing</artifactId>
-  <version>4.2.3-SNAPSHOT</version>
+  <version>4.2.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Slicing</name>

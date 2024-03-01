@@ -2,7 +2,7 @@
 <feature
       id="com.ensoftcorp.open.slice.feature"
       label="Slicing Toolbox"
-      version="4.2.3.qualifier"
+      version="4.2.4.qualifier"
       provider-name="Ensoft Corp.">
 
    <description url="https://ensoftcorp.github.io/slicing-toolbox">
@@ -39,10 +39,10 @@ SOFTWARE.
 
    <requires>
       <import plugin="com.ensoftcorp.atlas.ui"/>
-      <import feature="com.ensoftcorp.open.commons.feature" version="4.2.3.qualifier"/>
-      <import plugin="com.ensoftcorp.open.commons" version="4.2.3" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.commons.ui" version="4.2.3" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.slice" version="4.2.3" match="greaterOrEqual"/>
+      <import feature="com.ensoftcorp.open.commons.feature" version="4.2.4.qualifier"/>
+      <import plugin="com.ensoftcorp.open.commons" version="4.2.4" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.commons.ui" version="4.2.4" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.slice" version="4.2.4" match="greaterOrEqual"/>
    </requires>
 
    <plugin
